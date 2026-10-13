@@ -1026,7 +1026,7 @@ main{min-width:0}
   }
 
   async function ghRead() {
-    const res = await fetch(`${API}?ref=${GH.branch}&t=${Date.now()}`, { headers: ghHeaders(), cache: "no-store" });
+    const res = await fetch(`${API}?ref=${GH.branch}&t=${Date.now()}`, { headers: ghHeaders(false, authBroken ? null : token), cache: "no-store" });
     lastRead = Date.now();
     if (res.status === 404) return { sha: null, owned: [] };
     if (!res.ok) throw await ghError(res);
@@ -1140,7 +1140,7 @@ main{min-width:0}
     err.hidden = !authBroken;
     if (authBroken) err.innerHTML = authReason === "perms"
       ? 'Your saved token can view the shelf but can’t save. On GitHub, open <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">your tokens</a>, click <b>Goosebumps Tracker</b>, then <b>Edit</b>. Pick <b>goosebumps-tracker</b> under Only select repositories, set <b>Contents</b> to <b>Read and write</b>, and save. Then tap <b>I fixed it, try again</b>.'
-      : "Your saved token has expired or was deleted. Make a new one with the steps above and paste it here.";
+      : 'Your saved token has expired or was deleted. On GitHub, open <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">your tokens</a>, click <b>Goosebumps Tracker</b>, then <b>Regenerate token</b>, and paste the new token here. (If it’s gone from the list, make a new one with the steps above.)';
     $("retryToken").hidden = !(token && authBroken && authReason === "perms");
     $("connectLast").textContent = lastSynced
       ? `Last synced ${new Date(lastSynced).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}${pending.size ? ` · ${pending.size} change${pending.size > 1 ? "s" : ""} waiting to save` : ""}.`
