@@ -595,6 +595,7 @@ main{min-width:0}
         <input id="tokenInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…">
       </label>
       <p class="connect-err" id="connectErr" hidden></p>
+      <button class="ghost-btn" id="retryToken" type="button" hidden>I fixed it, try again</button>
       <button class="v-toggle" id="connectSave" type="button">CONNECT</button>
       <p class="fine">The token is saved in this browser only and is sent to nowhere but GitHub. On iPhone, a home-screen icon keeps its own storage, so connect once inside it too.</p>
     </div>
@@ -942,6 +943,7 @@ main{min-width:0}
   const PENDING_KEY = "gb.pending.v1";   // taps not yet saved to GitHub, kept across reloads
   let token = prefs.get(TOKEN_KEY, null);
   let authBroken = false;
+  let authReason = "";      // "expired" (401) or "perms" (403/404 on save)
   let syncing = false, syncAgain = false, syncTimer = 0, lastSynced = 0, lastRead = 0;
   const pending = new Map((prefs.get(PENDING_KEY, []) || []).filter(([n]) => byN.has(n)));
   Object.defineProperty(state, "readonly", { get: () => !token || authBroken, configurable: true });
@@ -1098,9 +1100,11 @@ main{min-width:0}
   function handleSyncError(e) {
     if (e.status === 401) {
       authBroken = true;
+      authReason = "expired";
       setSync("error", "Token expired or revoked · reconnect");
     } else if ((e.status === 403 && !e.rateLimited) || (e.status === 404 && token)) {
       authBroken = true;
+      authReason = "perms";
       setSync("error", "Token can’t edit this repo · fix it");
       toast("Your token can read the shelf but can’t save. Give it Contents: Read and write.", openConnect, "FIX");
     } else if (e.rateLimited) {
@@ -1134,7 +1138,10 @@ main{min-width:0}
     $("connectTitle").textContent = on ? "This device is connected" : authBroken ? "Reconnect this device" : "Connect this device";
     const err = $("connectErr");
     err.hidden = !authBroken;
-    if (authBroken) err.textContent = "The saved token stopped working or can’t save changes. Make a new one (steps above) and paste it here.";
+    if (authBroken) err.innerHTML = authReason === "perms"
+      ? 'Your saved token can view the shelf but can’t save. On GitHub, open <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">your tokens</a>, click <b>Goosebumps Tracker</b>, then <b>Edit</b>. Pick <b>goosebumps-tracker</b> under Only select repositories, set <b>Contents</b> to <b>Read and write</b>, and save. Then tap <b>I fixed it, try again</b>.'
+      : "Your saved token has expired or was deleted. Make a new one with the steps above and paste it here.";
+    $("retryToken").hidden = !(token && authBroken && authReason === "perms");
     $("connectLast").textContent = lastSynced
       ? `Last synced ${new Date(lastSynced).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}${pending.size ? ` · ${pending.size} change${pending.size > 1 ? "s" : ""} waiting to save` : ""}.`
       : "Not synced yet.";
@@ -1184,6 +1191,14 @@ main{min-width:0}
     }
   });
   $("syncNowBtn").addEventListener("click", () => { syncNow(); });
+  $("retryToken").addEventListener("click", () => {
+    authBroken = false;
+    authReason = "";
+    closeConnect();
+    paint();
+    setSync("saving", "Checking your token…");
+    syncNow();
+  });
   $("disconnect").addEventListener("click", () => {
     token = null;
     authBroken = false;
