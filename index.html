@@ -1,0 +1,1531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Goosebumps Tracker</title>
+<meta name="description" content="My original-series Goosebumps collection: all 62 books, which ones I own, and which ones I still need.">
+<meta name="theme-color" content="#1c1335">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Goosebumps">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700&family=Creepster&display=swap">
+<style>
+html{padding:env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+
+/* Layout: a night-sky bookshelf. Sticky stats panel on the left (stacked above the list on phones),
+   books on the right as rows or a cover grid, grouped by publication year. Owned books are in full
+   color; missing ones are cold purple ghosts. One deliberate dark world, no light theme. */
+:root{
+  --night:#1c1335;
+  --night-2:#261a46;
+  --night-3:#31235a;
+  --line:#41316c;
+  --bone:#f4eddb;
+  --dusk:#b2a6cf;
+  --dim:#8d80ad;
+  --slime:#97e53e;
+  --slime-deep:#4c8c17;
+  --ink-slime:#152609;
+  --pumpkin:#ff9d42;
+  --moon:rgba(151,229,62,.09);
+  --haze:rgba(125,72,210,.20);
+  --shade:rgba(8,4,20,.55);
+  --scrim:rgba(12,7,26,.86);
+  --dummy-skin:#f0cfa7;
+  --dummy-skin-2:#d9b087;
+  --dummy-hair:#3a2416;
+  --dummy-ink:#1a1010;
+  --dummy-lip:#c0283a;
+  --dummy-cheek:#e98a8a;
+  --dummy-eye:#fbf7ef;
+  --dummy-suit:#5d5a6e;
+  --dummy-tie:#c0283a;
+
+  --f-display:"Creepster", "Chiller", Impact, fantasy;
+  --f-body:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-label:"Barlow Condensed", "Arial Narrow", "Roboto Condensed", ui-sans-serif, sans-serif;
+
+  --r-card:16px;
+  color-scheme:dark;
+}
+html{background:var(--night)}
+html.locked{overflow:hidden}
+body{
+  background:var(--night);
+  background-image:
+    radial-gradient(1100px 620px at 88% -12%, var(--moon), transparent 62%),
+    radial-gradient(900px 560px at -12% 108%, var(--haze), transparent 62%);
+  background-attachment:fixed;
+  color:var(--bone);
+  font-family:var(--f-body);
+  font-size:15px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--slime);outline-offset:2px}
+.label{font-family:var(--f-label);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dusk);margin:0}
+
+.app{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:18px 40px}
+@media (min-width:900px){.app{padding-inline:28px;padding-block:28px 56px}}
+
+/* Masthead */
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 20px;padding-block:4px 20px}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+.wordmark{
+  font-family:var(--f-display);font-weight:400;margin:0;
+  font-size:clamp(48px, 10vw, 80px);line-height:.92;letter-spacing:.01em;
+  color:var(--slime);
+  text-shadow:0 3px 0 var(--slime-deep), 0 0 30px rgba(151,229,62,.22);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  user-select:none;-webkit-user-select:none;cursor:default;
+  -webkit-tap-highlight-color:transparent;
+}
+.stamp{
+  font-family:var(--f-label);font-weight:800;font-size:15px;letter-spacing:.22em;line-height:1;
+  color:var(--pumpkin);border:2px solid currentColor;border-radius:4px;padding:5px 7px 4px 9px;
+  transform:rotate(-7deg);text-shadow:none;
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-family:var(--f-label);font-weight:600;font-size:15px;letter-spacing:.04em;
+  padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--night-2);color:var(--bone);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.chip svg{width:16px;height:16px;flex:none}
+.chip.pumpkin{border-color:rgba(255,157,66,.5);color:var(--pumpkin)}
+
+/* Two-column layout */
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;align-items:start}
+.panel{
+  position:sticky;top:calc(16px + env(safe-area-inset-top, 0px));
+  display:flex;flex-direction:column;gap:14px;
+  max-height:calc(100vh - 32px);overflow:auto;scrollbar-width:thin;padding-bottom:4px;
+}
+.card{background:var(--night-2);border:1px solid var(--line);border-radius:var(--r-card);padding:16px}
+@media (max-width:899px){
+  .layout{display:flex;flex-direction:column;align-items:stretch;gap:14px}
+  .layout > *{min-width:0}
+  .panel{display:contents}
+  .card-progress{order:1}
+  .card-sets{order:2}
+  main{order:3}
+  .card-fact{order:4}
+}
+
+/* Progress card */
+.card-progress{display:flex;flex-direction:column;gap:14px}
+.bigcount{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.bigcount .num{font-family:var(--f-label);font-weight:800;font-size:60px;line-height:.9;color:var(--bone);font-variant-numeric:tabular-nums}
+.bigcount .of{font-family:var(--f-label);font-weight:600;font-size:22px;color:var(--dusk)}
+.bigcount .pct{margin-left:auto;font-family:var(--f-label);font-weight:700;font-size:20px;color:var(--slime);font-variant-numeric:tabular-nums}
+.complete-badge{font-family:var(--f-label);font-weight:800;letter-spacing:.18em;font-size:13px;color:var(--ink-slime);background:var(--slime);padding:4px 8px;border-radius:4px;transform:rotate(-4deg)}
+
+.tube{position:relative;height:40px}
+.track{position:relative;height:22px;border-radius:999px;background:var(--night);border:1px solid var(--line);overflow:hidden;box-shadow:inset 0 2px 6px var(--shade)}
+.goo{
+  position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(180deg, #b6f56c 0%, var(--slime) 38%, var(--slime-deep) 100%);
+  border-radius:999px;transition:width .9s cubic-bezier(.3,.9,.3,1.1);
+}
+.goo::after{content:"";position:absolute;left:10px;right:14px;top:4px;height:4px;border-radius:4px;background:rgba(255,255,255,.35)}
+.drips{position:absolute;left:0;right:0;top:20px;height:20px;pointer-events:none}
+.drips i{position:absolute;top:0;width:8px;border-radius:0 0 8px 8px;background:linear-gradient(180deg,var(--slime),var(--slime-deep));transform-origin:top;animation:ooze 3.6s ease-in-out infinite}
+.drips i::after{content:"";position:absolute;left:50%;bottom:-3px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--slime-deep)}
+@keyframes ooze{0%,100%{transform:scaleY(.8)}50%{transform:scaleY(1.15)}}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin:0}
+.stats div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.stats dt{font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.stats dd{margin:0;font-family:var(--f-label);font-weight:700;font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stats .owned dd{color:var(--slime)}
+.stats .missing dd{color:var(--pumpkin)}
+
+.hunt{
+  display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;width:100%;
+  background:transparent;border:1px dashed rgba(255,157,66,.55);border-radius:12px;padding:10px 12px;
+}
+.hunt .label{color:var(--pumpkin)}
+.hunt .what{font-weight:500;font-size:15px}
+.hunt:hover{background:rgba(255,157,66,.07)}
+.row-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ghost-btn{
+  background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 14px;min-height:38px;
+  font-family:var(--f-label);font-weight:700;font-size:15px;letter-spacing:.04em;color:var(--bone);
+}
+.ghost-btn:hover{background:var(--night-3)}
+.sync{font-size:12.5px;color:var(--dim);display:inline-flex;align-items:center;gap:6px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dim);flex:none}
+.sync[data-state="synced"]::before{background:var(--slime);box-shadow:0 0 8px var(--slime)}
+.sync[data-state="local"]::before,.sync[data-state="error"]::before{background:var(--pumpkin)}
+
+/* Sets card */
+.card-sets{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sets{display:flex;flex-wrap:wrap;gap:8px}
+@media (max-width:899px){
+  .sets{flex-wrap:nowrap;overflow-x:auto;margin-inline:-16px;padding-inline:16px;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .sets::-webkit-scrollbar{display:none}
+}
+.set{
+  flex:none;display:inline-flex;align-items:center;gap:8px;min-height:36px;
+  padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--night);
+  font-size:14px;font-weight:500;white-space:nowrap;
+}
+.set .n{font-family:var(--f-label);font-weight:700;font-size:14px;color:var(--dim);font-variant-numeric:tabular-nums}
+.set.done{border-color:rgba(151,229,62,.55)}
+.set.done .n{color:var(--slime)}
+.set[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone)}
+.set[aria-pressed="true"] .n{color:var(--night)}
+.set:hover{border-color:var(--dusk)}
+
+/* Fact card */
+.card-fact{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.fact{margin:0;font-size:15px;line-height:1.5;max-width:60ch;min-height:4.5em}
+
+/* Toolbar */
+main{min-width:0}
+.toolbar{
+  position:sticky;top:env(safe-area-inset-top, 0px);z-index:10;
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  margin-inline:-16px;padding:10px 16px;
+  background:rgba(28,19,53,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+@media (min-width:900px){.toolbar{margin-inline:0;padding-inline:0;border-radius:0}}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--night-2);border:1px solid var(--line);flex:1 1 280px;min-width:0}
+.tabs button{
+  flex:1;border:0;background:transparent;border-radius:999px;min-height:36px;padding:4px 10px;
+  font-family:var(--f-label);font-weight:700;font-size:16px;letter-spacing:.03em;color:var(--dusk);
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;
+}
+.tabs button .n{font-variant-numeric:tabular-nums;opacity:.8}
+.tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night)}
+.tools{display:flex;gap:8px;flex:1 1 260px;min-width:0}
+.search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:var(--night-2);border:1px solid var(--line);min-height:44px}
+.search svg{width:17px;height:17px;flex:none;color:var(--dim)}
+.search input{flex:1;min-width:0;border:0;background:transparent;color:var(--bone);font:inherit;font-size:16px;padding:8px 0;outline:none}
+.search input::placeholder{color:var(--dim)}
+.search:focus-within{border-color:var(--slime)}
+.viewtoggle{display:flex;gap:2px;padding:4px;border-radius:999px;background:var(--night-2);border:1px solid var(--line)}
+.viewtoggle button{border:0;background:transparent;border-radius:999px;width:40px;height:34px;display:grid;place-items:center;color:var(--dusk)}
+.viewtoggle button svg{width:18px;height:18px}
+.viewtoggle button[aria-pressed="true"]{background:var(--bone);color:var(--night)}
+.active-set{flex-basis:100%;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--dusk)}
+.active-set strong{color:var(--bone);font-weight:600}
+.active-set button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 10px;font-family:var(--f-label);font-weight:700;letter-spacing:.04em;color:var(--bone)}
+.hint{margin:12px 0 4px;font-size:13.5px;color:var(--dim)}
+
+/* Shelf */
+.shelf{display:grid;column-gap:14px;row-gap:4px;margin-top:6px}
+.shelf.list{grid-template-columns:repeat(auto-fill, minmax(min(100%, 330px), 1fr))}
+.shelf.grid{grid-template-columns:repeat(auto-fill, minmax(102px, 1fr));column-gap:12px;row-gap:16px}
+@media (min-width:900px){.shelf.grid{grid-template-columns:repeat(auto-fill, minmax(124px, 1fr));column-gap:16px;row-gap:20px}}
+.year{
+  grid-column:1/-1;display:flex;align-items:baseline;gap:12px;margin:18px 0 4px;
+  font-family:var(--f-label);font-weight:800;font-size:22px;letter-spacing:.04em;color:var(--bone);
+}
+.year:first-child{margin-top:8px}
+.year::after{content:"";flex:1;height:1px;background:var(--line);align-self:center;order:1}
+.year .yn{font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);order:2}
+
+.book{position:relative;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.book img{display:block;pointer-events:none;-webkit-user-drag:none;transition:filter .5s ease, opacity .5s ease}
+.is-missing img{filter:grayscale(1) sepia(.35) hue-rotate(215deg) saturate(1.8) brightness(.6);opacity:.58}
+.is-unknown img{opacity:.8}
+
+/* list rows */
+.shelf.list .book{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;gap:4px;border-radius:12px}
+.shelf.list .book:hover{background:rgba(255,255,255,.035)}
+.thumb{padding:6px 0 6px 4px;border:0;background:transparent;border-radius:8px}
+.thumb img{width:44px;height:65px;object-fit:cover;border-radius:3px;box-shadow:0 4px 10px var(--shade)}
+.main{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;
+  min-height:74px;padding:8px 10px 8px 8px;border:0;background:transparent;border-radius:10px;text-align:left;
+}
+.txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.t{font-size:15.5px;font-weight:500;line-height:1.25;color:var(--bone);text-wrap:pretty}
+.no{font-family:var(--f-label);font-weight:700;font-size:15px;color:var(--dusk);letter-spacing:.02em;font-variant-numeric:tabular-nums;margin-right:2px}
+.meta{font-size:12.5px;color:var(--dim)}
+.is-missing .t{color:var(--dusk)}
+
+.tick{
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;
+  border:2px dashed var(--dim);background:transparent;color:transparent;
+  transition:background .25s, border-color .25s, transform .25s;
+}
+.tick svg{width:17px;height:17px}
+.is-owned .tick{background:var(--slime);border:2px solid var(--slime);color:var(--ink-slime);box-shadow:0 0 12px rgba(151,229,62,.35)}
+.is-unknown .tick{opacity:0}
+.main:active .tick,.tick:active{transform:scale(.88)}
+
+/* grid tiles */
+.shelf.grid .book{display:flex;flex-direction:column;gap:7px}
+.frame{position:relative}
+.cover{display:block;width:100%;padding:0;border:0;background:var(--night-2);border-radius:5px;aspect-ratio:300/443;max-width:100%}
+.cover img{width:100%;height:100%;object-fit:cover;border-radius:5px;box-shadow:0 8px 18px var(--shade)}
+.shelf.grid .tick{position:absolute;right:6px;bottom:6px;width:34px;height:34px;background:var(--scrim);border-color:var(--dusk)}
+.shelf.grid .is-owned .tick{background:var(--slime);border-color:var(--slime)}
+.cap{margin:0;font-size:12.5px;line-height:1.3;color:var(--bone)}
+.cap .no{font-size:13px}
+.shelf.grid .is-missing .cap{color:var(--dim)}
+
+.halloween .book[data-n="48"] img{box-shadow:0 0 0 2px var(--pumpkin), 0 0 22px var(--pumpkin)}
+
+.empty{padding:40px 0;display:flex;flex-direction:column;align-items:flex-start;gap:12px;color:var(--dusk)}
+.empty p{margin:0;font-size:16px}
+
+.foot{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.beware{font-family:var(--f-display);font-size:26px;color:var(--dusk);margin:0;letter-spacing:.02em}
+.credits{margin:0;font-size:12.5px;color:var(--dim);max-width:70ch}
+
+/* Viewer */
+.viewer{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:calc(12px + env(safe-area-inset-top, 0px)) 12px calc(12px + env(safe-area-inset-bottom, 0px))}
+.v-backdrop{position:absolute;inset:0;background:var(--scrim);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.v-card{
+  position:relative;display:grid;grid-template-columns:auto minmax(0,320px);gap:28px;align-items:center;
+  max-width:980px;max-height:100%;overflow:auto;overscroll-behavior:contain;
+  background:var(--night-2);border:1px solid var(--line);border-radius:20px;padding:24px;
+  animation:rise .22s ease-out;
+}
+@keyframes rise{from{transform:translateY(12px);opacity:.4}to{transform:none;opacity:1}}
+.v-close{position:absolute;top:10px;right:10px;z-index:2;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--night);display:grid;place-items:center}
+.v-close svg{width:18px;height:18px}
+.v-cover{position:relative;margin:0;justify-self:center;touch-action:pan-y}
+.v-cover img{display:block;height:min(76vh, 720px);width:auto;max-width:100%;aspect-ratio:640/945;object-fit:cover;border-radius:6px;background-size:cover;background-color:var(--night-3);box-shadow:0 24px 60px var(--shade)}
+.v-stamp{
+  position:absolute;top:18px;left:-8px;transform:rotate(-10deg);
+  font-family:var(--f-label);font-weight:800;font-size:18px;letter-spacing:.24em;
+  color:var(--pumpkin);border:3px solid var(--pumpkin);border-radius:5px;padding:4px 10px 3px 13px;background:var(--scrim);
+}
+.v-info{display:flex;flex-direction:column;gap:14px;min-width:0;padding-right:8px}
+.v-no{font-family:var(--f-label);font-weight:800;font-size:44px;line-height:.9;color:var(--slime)}
+.missing .v-no{color:var(--pumpkin)}
+.v-title{margin:0;font-size:26px;font-weight:700;line-height:1.15;text-wrap:balance}
+.v-meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:14.5px}
+.v-meta dt{font-family:var(--f-label);font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding-top:2px}
+.v-meta dd{margin:0}
+.v-set{margin:0;font-size:13.5px;color:var(--dusk)}
+.v-toggle{
+  display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border-radius:12px;
+  font-family:var(--f-label);font-weight:800;font-size:19px;letter-spacing:.05em;
+  border:2px solid var(--slime);background:transparent;color:var(--slime);
+}
+.v-toggle svg{width:20px;height:20px}
+.v-toggle[aria-pressed="true"]{background:var(--slime);color:var(--ink-slime)}
+.v-toggle-note{margin:-8px 0 0;font-size:12.5px;color:var(--dim);text-align:center}
+.v-hunt{display:flex;flex-direction:column;gap:8px}
+.v-hunt .label{color:var(--pumpkin)}
+.v-links{display:flex;flex-wrap:wrap;gap:8px}
+.v-links a{color:var(--bone);text-decoration:none;border:1px solid rgba(255,157,66,.55);border-radius:999px;padding:7px 13px;font-size:14px;font-weight:500}
+.v-links a:hover{background:rgba(255,157,66,.1)}
+.v-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:4px;border-top:1px solid var(--line)}
+.v-nav span{font-family:var(--f-label);font-weight:600;font-size:15px;color:var(--dim);font-variant-numeric:tabular-nums}
+.v-nav button{display:inline-flex;align-items:center;gap:4px;margin-top:10px}
+@media (max-width:719px){
+  .viewer{padding:calc(8px + env(safe-area-inset-top, 0px)) 8px calc(8px + env(safe-area-inset-bottom, 0px))}
+  .v-card{grid-template-columns:minmax(0,1fr);gap:16px;padding:16px;width:100%}
+  .v-cover img{height:min(54vh, 520px)}
+  .v-info{padding-right:0}
+  .v-no{font-size:36px}
+  .v-title{font-size:22px}
+}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom, 0px));z-index:45;
+  transform:translate(-50%, 16px);opacity:0;transition:transform .2s ease, opacity .2s ease;
+  display:flex;align-items:center;gap:14px;max-width:calc(100% - 32px);width:max-content;
+  background:var(--bone);color:var(--night);border-radius:14px;padding:10px 10px 10px 16px;
+  box-shadow:0 12px 30px var(--shade);font-size:14.5px;font-weight:500;
+}
+.toast.show{transform:translate(-50%, 0);opacity:1}
+.toast span{min-width:0}
+.toast button{flex:none;border:0;border-radius:10px;padding:8px 12px;background:var(--night);color:var(--slime);font-family:var(--f-label);font-weight:800;font-size:15px;letter-spacing:.06em}
+
+/* Desktop hover peek */
+.peek{position:fixed;z-index:35;width:220px;pointer-events:none;opacity:0;transition:opacity .15s ease}
+.peek.show{opacity:1}
+.peek img{display:block;width:100%;aspect-ratio:640/945;object-fit:cover;border-radius:6px;background-size:cover;background-color:var(--night-3);box-shadow:0 18px 44px var(--shade), 0 0 0 1px var(--line)}
+
+/* Copy fallback */
+.copybox{position:fixed;inset:0;z-index:46;display:grid;place-items:center;padding:16px;background:var(--scrim)}
+.copy-card{width:min(440px,100%);background:var(--night-2);border:1px solid var(--line);border-radius:var(--r-card);padding:18px;display:flex;flex-direction:column;gap:10px}
+.copy-card textarea{width:100%;box-sizing:border-box;min-height:220px;background:var(--night);color:var(--bone);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:14px;resize:vertical}
+.copy-card p{margin:0;font-size:13.5px;color:var(--dusk)}
+
+/* Sync status + connect dialog */
+.sync{border:0;background:transparent;padding:6px 0;text-align:left;font-family:inherit;cursor:pointer}
+.sync:hover{color:var(--bone)}
+.sync[data-state="viewonly"]::before{background:var(--dusk)}
+.sync[data-state="saving"]::before{background:var(--slime);animation:blink 1s ease-in-out infinite}
+.sync[data-state="offline"]::before{background:var(--pumpkin)}
+@keyframes blink{50%{opacity:.25}}
+.connect{position:fixed;inset:0;z-index:47;display:grid;place-items:center;padding:calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px));background:var(--scrim);overflow:auto}
+.connect-card{position:relative;width:min(500px,100%);max-height:100%;overflow:auto;background:var(--night-2);border:1px solid var(--line);border-radius:var(--r-card);padding:22px;display:flex;flex-direction:column;gap:12px}
+.connect-card p{margin:0;font-size:14.5px;line-height:1.5}
+.connect-title{margin:0;padding-right:44px;font-size:22px;font-weight:700}
+.connect-pane{display:flex;flex-direction:column;gap:12px}
+.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.45;color:var(--bone)}
+.steps a,.connect-card a{color:var(--slime)}
+.steps b{font-weight:700}
+.field{display:flex;flex-direction:column;gap:6px}
+.field input{width:100%;box-sizing:border-box;min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--night);color:var(--bone);font:inherit;font-size:16px;padding:10px 12px}
+.field input:focus{border-color:var(--slime);outline:none}
+.connect-err{color:var(--pumpkin)}
+.fine{font-size:12.5px !important;color:var(--dim)}
+.pane-actions{display:flex;flex-wrap:wrap;gap:8px}
+.ghost-btn.danger{color:var(--pumpkin);border-color:rgba(255,157,66,.45)}
+
+/* Easter eggs */
+.dummy{position:fixed;right:10px;bottom:0;z-index:50;display:flex;align-items:flex-end;gap:4px;transform:translateY(105%);transition:transform .5s cubic-bezier(.2,1.3,.4,1);cursor:pointer;padding-bottom:env(safe-area-inset-bottom, 0px)}
+.dummy.up{transform:none}
+.bubble{
+  position:relative;margin-bottom:118px;max-width:min(240px, 60vw);
+  background:var(--bone);color:var(--night);border-radius:16px;padding:10px 14px;
+  font-weight:700;font-size:15px;line-height:1.3;box-shadow:0 10px 26px var(--shade);
+}
+.bubble::after{content:"";position:absolute;right:-8px;bottom:14px;border:8px solid transparent;border-left-color:var(--bone);border-right:0}
+.dummy svg{width:128px;height:auto;display:block;filter:drop-shadow(0 10px 20px var(--shade))}
+.dummy .jaw{transition:transform .1s}
+.dummy.talk .jaw{animation:yap .28s steps(2) infinite}
+@keyframes yap{0%{transform:translateY(0)}100%{transform:translateY(6px)}}
+.dummy.talk .brow{animation:brow .8s ease-in-out infinite alternate}
+@keyframes brow{to{transform:translateY(-2px)}}
+
+.fog{position:fixed;inset:0;z-index:30;pointer-events:none;overflow:hidden}
+.fog i{position:absolute;left:-40%;width:180%;height:60%;bottom:-18%;background:radial-gradient(closest-side, rgba(200,190,230,.16), transparent 70%);filter:blur(8px);animation:drift 26s linear infinite alternate}
+.fog i:nth-child(2){bottom:-8%;height:40%;animation-duration:38s;animation-direction:alternate-reverse;opacity:.8}
+@keyframes drift{from{transform:translateX(-8%)}to{transform:translateX(8%)}}
+
+.celebrate{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(12,7,26,.7)}
+.curtain{position:absolute;inset:0 0 auto 0;height:100%;pointer-events:none;overflow:hidden}
+.curtain::before{content:"";position:absolute;left:0;right:0;top:0;height:26px;background:var(--slime)}
+.curtain i{position:absolute;top:0;height:0;border-radius:0 0 999px 999px;background:linear-gradient(180deg,var(--slime),var(--slime-deep));animation:pour 1.8s cubic-bezier(.3,.7,.3,1) forwards}
+@keyframes pour{to{height:var(--h)}}
+.cel-card{position:relative;background:var(--night-2);border:2px solid var(--slime);border-radius:20px;padding:24px;max-width:380px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.cel-card .big{font-family:var(--f-display);font-size:56px;line-height:.95;color:var(--slime);margin:0;text-shadow:0 3px 0 var(--slime-deep)}
+.cel-card p{margin:0;font-size:16px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  .curtain i{height:var(--h)}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="masthead">
+    <div class="brand">
+      <p class="label">Original series · #1–#62 · 1992–1997</p>
+      <h1 class="wordmark" id="wordmark">Goosebumps <span class="stamp">TRACKER</span></h1>
+    </div>
+    <div class="chips">
+      <span class="chip pumpkin" id="halloweenChip" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 6c-1.2-.6-2.6-.7-4-.3C4.6 6.6 3 9.6 3 13s2 6.5 5 7.3c1.4.4 2.8.2 4-.4 1.2.6 2.6.8 4 .4 3-.8 5-3.9 5-7.3s-1.6-6.4-5-7.3c-1.4-.4-2.8-.3-4 .3Zm-.8-.6c.2-1.7 1-3 2.6-3.6l.5 1.1c-1 .5-1.5 1.3-1.6 2.6Z"/></svg>
+        <span id="halloweenText"></span>
+      </span>
+      <span class="chip" id="midnightChip" hidden></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="panel">
+      <section class="card card-progress" aria-labelledby="progressLabel">
+        <h2 class="label" id="progressLabel">On my shelf</h2>
+        <div class="bigcount">
+          <span class="num" id="ownedBig">–</span><span class="of">of 62</span>
+          <span class="complete-badge" id="completeBadge" hidden>COMPLETE</span>
+          <span class="pct" id="pctBig"></span>
+        </div>
+        <div class="tube" aria-hidden="true">
+          <div class="track"><div class="goo" id="goo"></div></div>
+          <div class="drips" id="drips"></div>
+        </div>
+        <dl class="stats">
+          <div class="owned"><dt>Owned</dt><dd id="stOwned">–</dd></div>
+          <div class="missing"><dt>Missing</dt><dd id="stMissing">–</dd></div>
+          <div><dt>Pages on shelf</dt><dd id="stPages">–</dd></div>
+          <div><dt>Longest run</dt><dd id="stRun">–</dd></div>
+        </dl>
+        <button class="hunt" id="nextHunt" type="button" hidden>
+          <span class="label">Next to hunt</span>
+          <span class="what" id="nextHuntText"></span>
+        </button>
+        <div class="row-actions">
+          <button class="ghost-btn" id="copyWant" type="button">Copy want list</button>
+          <button class="sync" id="sync" type="button" data-state="loading" aria-live="polite">Opening the vault…</button>
+        </div>
+      </section>
+
+      <section class="card card-sets" aria-labelledby="setsLabel">
+        <h2 class="label" id="setsLabel">Sequels &amp; sets</h2>
+        <div class="sets" id="sets"></div>
+      </section>
+
+      <section class="card card-fact" aria-labelledby="factLabel">
+        <h2 class="label" id="factLabel">Fright fact</h2>
+        <p class="fact" id="fact"></p>
+        <button class="ghost-btn" id="nextFact" type="button">Another fact</button>
+      </section>
+    </aside>
+
+    <main id="main">
+      <div class="toolbar" id="toolbar">
+        <div class="tabs" role="group" aria-label="Show books">
+          <button type="button" data-filter="all" aria-pressed="true">All <span class="n" id="nAll">62</span></button>
+          <button type="button" data-filter="owned" aria-pressed="false">Owned <span class="n" id="nOwned">–</span></button>
+          <button type="button" data-filter="missing" aria-pressed="false">Missing <span class="n" id="nMissing">–</span></button>
+        </div>
+        <div class="tools">
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+            <input id="q" type="search" placeholder="Search title or number" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search books">
+          </label>
+          <div class="viewtoggle" role="group" aria-label="Layout">
+            <button type="button" data-view-mode="list" aria-pressed="true" aria-label="List" title="List">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><rect x="3.5" y="4.5" width="2.5" height="3" rx=".5"/><rect x="3.5" y="10.5" width="2.5" height="3" rx=".5"/><rect x="3.5" y="16.5" width="2.5" height="3" rx=".5"/></svg>
+            </button>
+            <button type="button" data-view-mode="grid" aria-pressed="false" aria-label="Covers" title="Covers">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="9" rx="1"/><rect x="13.5" y="3.5" width="7" height="9" rx="1"/><rect x="3.5" y="14.5" width="7" height="6" rx="1"/><rect x="13.5" y="14.5" width="7" height="6" rx="1"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="active-set" id="activeSet" hidden>
+          <span>Showing <strong id="activeSetText"></strong></span>
+          <button type="button" id="clearSet">Show all</button>
+        </div>
+      </div>
+      <p class="hint" id="hint"></p>
+      <div class="shelf list" id="shelf"></div>
+      <div class="empty" id="empty" hidden>
+        <p id="emptyText"></p>
+        <button class="ghost-btn" id="emptyClear" type="button">Show all books</button>
+      </div>
+    </main>
+  </div>
+
+  <footer class="foot">
+    <p class="beware">Reader beware, you’re in for a scare!</p>
+    <p class="credits">Cover images and first-edition details come from the Goosebumps Wiki (goosebumps.fandom.com). Goosebumps is a trademark of Scholastic Inc. This is a personal collection tracker, not an official site. The shelf itself is saved in this site’s GitHub repo.</p>
+  </footer>
+</div>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vTitle" hidden>
+  <div class="v-backdrop" data-close></div>
+  <div class="v-card" id="vCard">
+    <button class="v-close" type="button" data-close aria-label="Close" id="vClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <figure class="v-cover" id="vCover">
+      <img id="vImg" alt="" width="640" height="945">
+      <span class="v-stamp" id="vStamp" hidden>MISSING</span>
+    </figure>
+    <div class="v-info">
+      <div class="v-no" id="vNo"></div>
+      <h2 class="v-title" id="vTitle"></h2>
+      <dl class="v-meta">
+        <dt>Published</dt><dd id="vDate"></dd>
+        <dt>Pages</dt><dd id="vPages"></dd>
+        <dt>Cover art</dt><dd id="vArtist"></dd>
+      </dl>
+      <p class="v-set" id="vSet" hidden></p>
+      <button class="v-toggle" id="vToggle" type="button" aria-pressed="false"></button>
+      <p class="v-toggle-note" id="vToggleNote"></p>
+      <div class="v-hunt" id="vHunt" hidden>
+        <span class="label">Find a copy</span>
+        <div class="v-links">
+          <a id="lEbay" target="_blank" rel="noopener noreferrer">eBay</a>
+          <a id="lThrift" target="_blank" rel="noopener noreferrer">ThriftBooks</a>
+          <a id="lAbe" target="_blank" rel="noopener noreferrer">AbeBooks</a>
+        </div>
+      </div>
+      <div class="v-nav">
+        <button class="ghost-btn" id="vPrev" type="button" aria-label="Previous book">‹ Prev</button>
+        <span id="vPos"></span>
+        <button class="ghost-btn" id="vNext" type="button" aria-label="Next book">Next ›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastText"></span><button type="button" id="toastUndo">UNDO</button></div>
+<div class="peek" id="peek" aria-hidden="true" hidden><img id="peekImg" alt=""></div>
+
+<div class="copybox" id="copybox" role="dialog" aria-modal="true" aria-labelledby="copyLabel" hidden>
+  <div class="copy-card">
+    <h2 class="label" id="copyLabel">Your want list</h2>
+    <textarea id="copyText" readonly></textarea>
+    <p>Your browser blocked automatic copying. Select the text above and copy it.</p>
+    <button class="ghost-btn" id="copyDone" type="button">Done</button>
+  </div>
+</div>
+
+<div class="connect" id="connect" role="dialog" aria-modal="true" aria-labelledby="connectTitle" hidden>
+  <div class="connect-card">
+    <button class="v-close" type="button" id="connectClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <h2 class="connect-title" id="connectTitle">Connect this device</h2>
+    <div class="connect-pane" id="connectOff">
+      <p>Anyone with the link can look at this shelf. To change it from this device, paste a GitHub access token that can only edit this one repo. You make the token once, then paste it on each device you use.</p>
+      <ol class="steps">
+        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHub’s new token page</a> (signed in as you).</li>
+        <li>Name it <b>Goosebumps Tracker</b> and pick an expiration. A year is fine.</li>
+        <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick <b>goosebumps-tracker</b>.</li>
+        <li>Under <b>Permissions</b>, add <b>Contents</b> and set it to <b>Read and write</b>.</li>
+        <li>Click <b>Generate token</b>, copy it, and paste it below.</li>
+      </ol>
+      <label class="field" for="tokenInput">
+        <span class="label">Access token</span>
+        <input id="tokenInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…">
+      </label>
+      <p class="connect-err" id="connectErr" hidden></p>
+      <button class="v-toggle" id="connectSave" type="button">CONNECT</button>
+      <p class="fine">The token is saved in this browser only and is sent to nowhere but GitHub. On iPhone, a home-screen icon keeps its own storage, so connect once inside it too.</p>
+    </div>
+    <div class="connect-pane" id="connectOn" hidden>
+      <p>This device can change your shelf. Each tap saves to GitHub about a second later, and your other devices pick it up within 30 seconds or as soon as you switch back to them.</p>
+      <p class="fine" id="connectLast"></p>
+      <div class="pane-actions">
+        <button class="ghost-btn" id="syncNowBtn" type="button">Sync now</button>
+        <button class="ghost-btn danger" id="disconnect" type="button">Disconnect this device</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fog" id="fog" aria-hidden="true" hidden><i></i><i></i></div>
+
+<div class="celebrate" id="celebrate" role="dialog" aria-modal="true" aria-labelledby="celTitle" hidden>
+  <div class="curtain" id="curtain"></div>
+  <div class="cel-card">
+    <p class="big" id="celTitle">All 62!</p>
+    <p>Every original Goosebumps book is on your shelf. The collection is complete.</p>
+    <button class="ghost-btn" id="celClose" type="button">Admire my shelf</button>
+  </div>
+</div>
+
+<div class="dummy" id="dummy" aria-live="polite" hidden>
+  <div class="bubble" id="dummyText"></div>
+  <svg viewBox="0 0 120 170" aria-hidden="true">
+    <path d="M12 170c2-28 18-42 48-42s46 14 48 42Z" fill="var(--dummy-suit)"/>
+    <path d="M45 128 60 152 75 128Z" fill="var(--dummy-eye)"/>
+    <rect x="50" y="104" width="20" height="26" fill="var(--dummy-skin-2)"/>
+    <path d="M60 137 45 129v16Zm0 0 15-8v16Z" fill="var(--dummy-tie)"/>
+    <circle cx="60" cy="137" r="4" fill="var(--dummy-tie)"/>
+    <ellipse cx="24.5" cy="68" rx="6" ry="9" fill="var(--dummy-skin-2)"/>
+    <ellipse cx="95.5" cy="68" rx="6" ry="9" fill="var(--dummy-skin-2)"/>
+    <ellipse cx="60" cy="64" rx="36" ry="42" fill="var(--dummy-skin)"/>
+    <path d="M24 54C21 24 45 14 62 15c22 1 37 14 34 40-6-13-16-20-30-20-8 6-22 6-30 2-6 4-10 10-12 17Z" fill="var(--dummy-hair)"/>
+    <g class="brow">
+      <path d="M33 50q10-9 21-2" stroke="var(--dummy-ink)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M66 48q11-7 21 2" stroke="var(--dummy-ink)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="45" cy="61" rx="8.5" ry="7.5" fill="var(--dummy-eye)"/>
+    <ellipse cx="75" cy="61" rx="8.5" ry="7.5" fill="var(--dummy-eye)"/>
+    <circle cx="46" cy="62" r="3.8" fill="var(--dummy-ink)"/>
+    <circle cx="76" cy="62" r="3.8" fill="var(--dummy-ink)"/>
+    <circle cx="33" cy="80" r="6" fill="var(--dummy-cheek)" opacity=".75"/>
+    <circle cx="87" cy="80" r="6" fill="var(--dummy-cheek)" opacity=".75"/>
+    <path d="M44 88q16 9 32 0v7q-16 10-32 0Z" fill="var(--dummy-ink)"/>
+    <path d="M41 85q19 11 38 0" stroke="var(--dummy-lip)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <g class="jaw">
+      <path d="M44 88q16 9 32 0v12q-16 14-32 0Z" fill="var(--dummy-skin)" stroke="var(--dummy-ink)" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M51 94q9 5 18 0" stroke="var(--dummy-lip)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- Catalog (first editions, per the Goosebumps Wiki) ----------
+  const RAW = [
+    [1, "Welcome to Dead House", "July 1992", 123, "Tim Jacobus"],
+    [2, "Stay Out of the Basement", "July 1992", 122, "Jim Thiesen"],
+    [3, "Monster Blood", "September 1992", 128, "Tim Jacobus"],
+    [4, "Say Cheese and Die!", "November 1992", 132, "Tim Jacobus"],
+    [5, "The Curse of the Mummy’s Tomb", "January 1993", 132, "Tim Jacobus"],
+    [6, "Let’s Get Invisible!", "March 1993", 139, "Tim Jacobus"],
+    [7, "Night of the Living Dummy", "May 1993", 134, "Tim Jacobus"],
+    [8, "The Girl Who Cried Monster", "May 1993", 137, "Tim Jacobus"],
+    [9, "Welcome to Camp Nightmare", "July 1993", 136, "Tim Jacobus"],
+    [10, "The Ghost Next Door", "August 1993", 124, "Tim Jacobus"],
+    [11, "The Haunted Mask", "September 1993", 121, "Tim Jacobus"],
+    [12, "Be Careful What You Wish For…", "October 1993", 121, "Stanislaw Fernandes"],
+    [13, "Piano Lessons Can Be Murder", "November 1993", 124, "Tim Jacobus"],
+    [14, "The Werewolf of Fever Swamp", "December 1993", 123, "Tim Jacobus"],
+    [15, "You Can’t Scare Me!", "January 1994", 120, "Tim Jacobus"],
+    [16, "One Day at HorrorLand", "February 1994", 123, "Tim Jacobus"],
+    [17, "Why I’m Afraid of Bees", "March 1994", 115, "Tim Jacobus"],
+    [18, "Monster Blood II", "April 1994", 121, "Tim Jacobus"],
+    [19, "Deep Trouble", "May 1994", 117, "Tim Jacobus"],
+    [20, "The Scarecrow Walks at Midnight", "May 1994", 122, "Tim Jacobus"],
+    [21, "Go Eat Worms!", "July 1994", 119, "Tim Jacobus"],
+    [22, "Ghost Beach", "August 1994", 119, "Tim Jacobus"],
+    [23, "Return of the Mummy", "September 1994", 118, "Tim Jacobus"],
+    [24, "Phantom of the Auditorium", "October 1994", 126, "Tim Jacobus"],
+    [25, "Attack of the Mutant", "November 1994", 117, "Tim Jacobus"],
+    [26, "My Hairiest Adventure", "December 1994", 122, "Tim Jacobus"],
+    [27, "A Night in Terror Tower", "January 1995", 129, "Tim Jacobus"],
+    [28, "The Cuckoo Clock of Doom", "February 1995", 118, "Tim Jacobus"],
+    [29, "Monster Blood III", "March 1995", 126, "Tim Jacobus"],
+    [30, "It Came from Beneath the Sink!", "April 1995", 112, "Tim Jacobus"],
+    [31, "Night of the Living Dummy II", "May 1995", 120, "Tim Jacobus"],
+    [32, "The Barking Ghost", "June 1995", 117, "Tim Jacobus"],
+    [33, "The Horror at Camp Jellyjam", "July 1995", 128, "Tim Jacobus"],
+    [34, "Revenge of the Lawn Gnomes", "August 1995", 119, "Tim Jacobus"],
+    [35, "A Shocker on Shock Street", "September 1995", 117, "Tim Jacobus"],
+    [36, "The Haunted Mask II", "October 1995", 124, "Tim Jacobus"],
+    [37, "The Headless Ghost", "November 1995", 113, "Tim Jacobus"],
+    [38, "The Abominable Snowman of Pasadena", "December 1995", 127, "Tim Jacobus"],
+    [39, "How I Got My Shrunken Head", "January 1996", 119, "Tim Jacobus"],
+    [40, "Night of the Living Dummy III", "February 1996", 125, "Tim Jacobus"],
+    [41, "Bad Hare Day", "March 1996", 117, "Tim Jacobus"],
+    [42, "Egg Monsters from Mars", "April 1996", 115, "Tim Jacobus"],
+    [43, "The Beast from the East", "May 1996", 118, "Tim Jacobus"],
+    [44, "Say Cheese and Die—Again!", "June 1996", 115, "Tim Jacobus"],
+    [45, "Ghost Camp", "July 1996", 118, "Tim Jacobus"],
+    [46, "How to Kill a Monster", "August 1996", 112, "Tim Jacobus"],
+    [47, "Legend of the Lost Legend", "September 1996", 122, "Tim Jacobus"],
+    [48, "Attack of the Jack-O’-Lanterns", "October 1996", 113, "Tim Jacobus"],
+    [49, "Vampire Breath", "November 1996", 114, "Tim Jacobus"],
+    [50, "Calling All Creeps!", "December 1996", 116, "Tim Jacobus"],
+    [51, "Beware, the Snowman", "January 1997", 113, "Tim Jacobus"],
+    [52, "How I Learned to Fly", "February 1997", 123, "Tim Jacobus"],
+    [53, "Chicken Chicken", "March 1997", 112, "Tim Jacobus"],
+    [54, "Don’t Go to Sleep!", "April 1997", 118, "Tim Jacobus"],
+    [55, "The Blob That Ate Everyone", "May 1997", 114, "Tim Jacobus"],
+    [56, "The Curse of Camp Cold Lake", "June 1997", 114, "Tim Jacobus"],
+    [57, "My Best Friend Is Invisible", "July 1997", 114, "Tim Jacobus"],
+    [58, "Deep Trouble II", "August 1997", 113, "Tim Jacobus"],
+    [59, "The Haunted School", "September 1997", 120, "Tim Jacobus"],
+    [60, "Werewolf Skin", "October 1997", 125, "Tim Jacobus"],
+    [61, "I Live in Your Basement!", "November 1997", 111, "Tim Jacobus"],
+    [62, "Monster Blood IV", "December 1997", 118, "Tim Jacobus"],
+  ];
+  const norm = s => s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "")
+    .replace(/['’‘]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  const BOOKS = RAW.map(([n, title, date, pages, artist]) => ({ n, title, date, pages, artist, year: +date.slice(-4), key: norm(title) }));
+  const byN = new Map(BOOKS.map(b => [b.n, b]));
+  const TOTAL = BOOKS.length;
+
+  const SETS = [
+    { id: "blood", name: "Monster Blood", label: "Monster Blood saga", books: [3, 18, 29, 62] },
+    { id: "dummy", name: "Living Dummy", label: "Living Dummy saga", books: [7, 31, 40] },
+    { id: "mask", name: "Haunted Mask", label: "Haunted Mask books", books: [11, 36] },
+    { id: "mummy", name: "Mummy", label: "Mummy books", books: [5, 23] },
+    { id: "cheese", name: "Say Cheese", label: "Say Cheese books", books: [4, 44] },
+    { id: "deep", name: "Deep Trouble", label: "Deep Trouble books", books: [19, 58] },
+    { id: "camp", name: "Camp", label: "camp books", books: [9, 33, 45, 56] },
+    { id: "ghost", name: "Ghosts", label: "ghost books", books: [10, 22, 32, 37, 45] },
+    { id: "wolf", name: "Werewolves", label: "werewolf books", books: [14, 60] },
+    { id: "snow", name: "Snowmen", label: "snowman books", books: [38, 51] },
+  ];
+  const SET_BY_ID = Object.fromEntries(SETS.map(s => [s.id, s]));
+  const ALIASES = { "slappy": "dummy", "mr wood": "dummy", "carly beth": "mask", "mummies": "mummy" };
+
+  const FACTS = [
+    "R.L. Stine put out a new Goosebumps book almost every month from July 1992 to December 1997. That’s 62 books in five and a half years.",
+    "Tim Jacobus painted 60 of the 62 original covers. The other two: #2 was painted by Jim Thiesen and #12 by Stanislaw Fernandes.",
+    "Slappy is already in #7, as Lindy’s dummy. The evil dummy in that book is Mr. Wood. Slappy takes over as the villain in #31.",
+    "The Goosebumps TV series ran on Fox Kids from 1995 to 1998. It opened with a two-part adaptation of The Haunted Mask.",
+    "Goosebumps has sold more than 400 million books around the world.",
+    "Before Goosebumps, R.L. Stine wrote joke books as “Jovial Bob Stine” and started the teen horror series Fear Street.",
+    "Longest book in the original run: #6 Let’s Get Invisible! at 139 pages. Shortest: #61 I Live in Your Basement! at 111.",
+    "Monster Blood is the biggest saga in the original series, with four books: #3, #18, #29 and #62.",
+    "#62 Monster Blood IV came out in December 1997 and closed the original series. Goosebumps Series 2000 picked up in 1998.",
+    "Jack Black played R.L. Stine in the 2015 Goosebumps movie.",
+    "R.L. Stine has said he usually comes up with the title first, then works out a story to fit it.",
+    "All 62 original books add up to 7,484 pages.",
+    "Two books came out in July 1992 to launch the series: #1 Welcome to Dead House and #2 Stay Out of the Basement.",
+  ];
+
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const pad = n => String(n).padStart(2, "0");
+  const cover = (n, size) => `covers/${size}/${pad(n)}.webp`;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const $ = id => document.getElementById(id);
+
+  // ---------- Per-device conveniences ----------
+  const prefs = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  const CACHE_KEY = "gb.cache.v1";   // last synced shelf, so the page paints instantly next time
+
+  const state = {
+    owned: null,          // Set of owned numbers, or null while loading
+    readonly: false,      // replaced by a getter in the sync section
+    filter: prefs.get("gb.filter", "all"),
+    view: prefs.get("gb.view", "list"),
+    q: "",
+    set: null,
+  };
+  if (!["all", "owned", "missing"].includes(state.filter)) state.filter = "all";
+  if (!["list", "grid"].includes(state.view)) state.view = "list";
+  const cached = prefs.get(CACHE_KEY, null);
+  if (Array.isArray(cached)) state.owned = new Set(cached.filter(n => byN.has(n)));
+
+  // ---------- Elements ----------
+  const shelf = $("shelf"), viewer = $("viewer"), vCard = $("vCard"), vImg = $("vImg");
+  const els = new Map();
+  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+  // ---------- Rendering ----------
+  function renderShelf() {
+    els.clear();
+    const grid = state.view === "grid";
+    shelf.className = "shelf " + (grid ? "grid" : "list");
+    let html = "", year = 0;
+    for (const b of BOOKS) {
+      if (b.year !== year) {
+        year = b.year;
+        html += `<h3 class="year" data-year="${year}"><span>${year}</span><span class="yn" data-yn="${year}"></span></h3>`;
+      }
+      const name = `#${b.n} ${esc(b.title)}`;
+      const img = `<img src="${cover(b.n, "sm")}" alt="" width="300" height="443" loading="lazy" decoding="async" draggable="false">`;
+      html += grid
+        ? `<div class="book" data-n="${b.n}">
+             <div class="frame">
+               <button type="button" class="cover" data-act="view" aria-label="See cover: ${name}">${img}</button>
+               <button type="button" class="tick" data-act="toggle" aria-pressed="false" aria-label="Owned: ${name}">${CHECK}</button>
+             </div>
+             <p class="cap"><span class="no">#${b.n}</span> ${esc(b.title)}</p>
+           </div>`
+        : `<div class="book" data-n="${b.n}">
+             <button type="button" class="thumb" data-act="view" aria-label="See cover: ${name}">${img}</button>
+             <button type="button" class="main" data-act="toggle" aria-pressed="false">
+               <span class="txt"><span class="t"><span class="no">#${b.n}</span> ${esc(b.title)}</span><span class="meta">${b.date} · ${b.pages} pages</span></span>
+               <span class="tick" aria-hidden="true">${CHECK}</span>
+             </button>
+           </div>`;
+    }
+    shelf.innerHTML = html;
+    shelf.querySelectorAll(".book").forEach(el => els.set(+el.dataset.n, el));
+    paint();
+  }
+
+  function longestRun(o) {
+    let best = [0, 0], start = 0;
+    for (let n = 1; n <= TOTAL + 1; n++) {
+      if (n <= TOTAL && o.has(n)) { if (!start) start = n; }
+      else if (start) { if (n - start > best[1] - best[0]) best = [start, n]; start = 0; }
+    }
+    return best[1] ? best : null;
+  }
+
+  function paint() {
+    const o = state.owned;
+    const locked = !o || state.readonly;
+    for (const [n, el] of els) {
+      const own = o ? o.has(n) : null;
+      el.classList.toggle("is-owned", own === true);
+      el.classList.toggle("is-missing", own === false);
+      el.classList.toggle("is-unknown", own === null);
+      const t = el.querySelector('[data-act="toggle"]');
+      t.setAttribute("aria-pressed", own ? "true" : "false");
+      t.setAttribute("aria-disabled", locked ? "true" : "false");
+    }
+    shelf.querySelectorAll("[data-yn]").forEach(s => {
+      const y = +s.dataset.yn, inYear = BOOKS.filter(b => b.year === y);
+      s.textContent = o ? `${inYear.filter(b => o.has(b.n)).length} of ${inYear.length}` : `${inYear.length} books`;
+    });
+
+    const owned = o ? o.size : null;
+    const missing = o ? TOTAL - owned : null;
+    const pct = o ? Math.round(owned / TOTAL * 100) : 0;
+    $("ownedBig").textContent = o ? owned : "–";
+    $("pctBig").textContent = o ? `${pct}%` : "";
+    $("completeBadge").hidden = owned !== TOTAL;
+    $("stOwned").textContent = o ? owned : "–";
+    $("stMissing").textContent = o ? missing : "–";
+    $("stPages").textContent = o ? BOOKS.filter(b => o.has(b.n)).reduce((a, b) => a + b.pages, 0).toLocaleString() : "–";
+    const run = o && longestRun(o);
+    $("stRun").textContent = run ? (run[1] - run[0] === 1 ? `#${run[0]}` : `#${run[0]}–#${run[1] - 1}`) : "–";
+    $("nOwned").textContent = o ? owned : "–";
+    $("nMissing").textContent = o ? missing : "–";
+
+    $("goo").style.width = pct + "%";
+    const drips = $("drips");
+    drips.innerHTML = [[6, 12], [17, 18], [29, 9], [43, 15], [56, 20], [70, 10], [84, 16], [95, 12]]
+      .filter(([x]) => x <= pct - 3)
+      .map(([x, h], i) => `<i style="left:${x}%;height:${h}px;animation-delay:${(i * 0.45).toFixed(2)}s"></i>`).join("");
+
+    const next = o && BOOKS.find(b => !o.has(b.n));
+    $("nextHunt").hidden = !next;
+    if (next) $("nextHuntText").textContent = `#${next.n} ${next.title}`;
+    $("copyWant").hidden = !o || missing === 0;
+
+    $("sets").innerHTML = SETS.map(s => {
+      const have = o ? s.books.filter(n => o.has(n)).length : null;
+      const done = have === s.books.length;
+      return `<button type="button" class="set${done ? " done" : ""}" data-set="${s.id}" aria-pressed="${state.set === s.id}">
+        <span>${s.name}</span><span class="n">${have == null ? s.books.length : `${have}/${s.books.length}`}</span>${done ? `<span style="color:var(--slime);display:grid;width:14px">${CHECK}</span>` : ""}
+      </button>`;
+    }).join("");
+
+    paintMidnight();
+    applyVisibility();
+  }
+
+  function matches(b) {
+    const o = state.owned;
+    if (state.filter === "owned" && !(o && o.has(b.n))) return false;
+    if (state.filter === "missing" && !(o && !o.has(b.n))) return false;
+    if (state.set && !SET_BY_ID[state.set].books.includes(b.n)) return false;
+    const raw = state.q.trim();
+    if (!raw) return true;
+    const num = raw.match(/^#?\s*(\d{1,2})$/);
+    if (num) return b.n === +num[1];
+    const q = norm(raw);
+    if (ALIASES[q]) return SET_BY_ID[ALIASES[q]].books.includes(b.n);
+    return b.key.includes(q);
+  }
+
+  function visibleNumbers() { return BOOKS.filter(matches).map(b => b.n); }
+
+  function applyVisibility() {
+    let count = 0;
+    const years = new Set();
+    for (const b of BOOKS) {
+      const v = matches(b);
+      const el = els.get(b.n);
+      if (el) el.hidden = !v;
+      if (v) { count++; years.add(b.year); }
+    }
+    shelf.querySelectorAll(".year").forEach(h => { h.hidden = !years.has(+h.dataset.year); });
+    $("empty").hidden = count > 0;
+    if (!count) $("emptyText").textContent = emptyMessage();
+    document.querySelectorAll(".tabs [data-filter]").forEach(t => t.setAttribute("aria-pressed", String(t.dataset.filter === state.filter)));
+    document.querySelectorAll("[data-view-mode]").forEach(t => t.setAttribute("aria-pressed", String(t.dataset.viewMode === state.view)));
+    $("activeSet").hidden = !state.set;
+    if (state.set) $("activeSetText").textContent = SET_BY_ID[state.set].label;
+  }
+
+  function emptyMessage() {
+    const o = state.owned, q = state.q.trim();
+    if (!o && state.filter !== "all") return "Loading your shelf…";
+    if (!q && !state.set && state.filter === "missing") return "Nothing missing. All 62 books are on your shelf.";
+    if (!q && !state.set && state.filter === "owned") return "No books on your shelf yet. Tap a book under All to add it.";
+    const where = state.filter === "all" ? "" : ` in ${state.filter === "owned" ? "Owned" : "Missing"}`;
+    return q ? `No books match “${q}”${where}.` : `No ${SET_BY_ID[state.set].label}${where}.`;
+  }
+
+  function paintHint() {
+    const mouse = canHover.matches;
+    $("hint").textContent = state.view === "list"
+      ? (mouse ? "Click a book to mark it owned. Hover or click its cover to see it big." : "Tap a book to mark it owned. Tap its cover, or press and hold, to see it big.")
+      : (mouse ? "Click a cover to see it big. Click the circle to mark it owned." : "Tap a cover to see it big. Tap the circle to mark it owned.");
+  }
+
+  // ---------- Ownership + sync (shelf.json on the repo's "data" branch) ----------
+  const GH = { owner: "icpryde", repo: "goosebumps-tracker", branch: "data", path: "shelf.json" };
+  const API = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+  const TOKEN_KEY = "gb.token.v1";
+  const PENDING_KEY = "gb.pending.v1";   // taps not yet saved to GitHub, kept across reloads
+  let token = prefs.get(TOKEN_KEY, null);
+  let authBroken = false;
+  let syncing = false, syncAgain = false, syncTimer = 0, lastSynced = 0, lastRead = 0;
+  const pending = new Map((prefs.get(PENDING_KEY, []) || []).filter(([n]) => byN.has(n)));
+  Object.defineProperty(state, "readonly", { get: () => !token || authBroken, configurable: true });
+
+  const savePending = () => prefs.set(PENDING_KEY, [...pending]);
+
+  function setSync(kind, text) {
+    const s = $("sync");
+    s.dataset.state = kind;
+    s.textContent = text || {
+      loading: "Opening the vault…",
+      syncing: "Syncing…",
+      saving: "Saving…",
+      synced: "Synced with GitHub",
+      viewonly: "View only · Connect this device",
+      offline: "Offline · showing your last shelf",
+      error: "Sync problem · tap for details",
+    }[kind];
+  }
+
+  function sameSet(a, b) { if (!a || !b || a.size !== b.size) return false; for (const x of a) if (!b.has(x)) return false; return true; }
+
+  function overlay(base) {
+    const s = new Set(base);
+    for (const [n, v] of pending) v ? s.add(n) : s.delete(n);
+    return s;
+  }
+
+  function commit(next) {
+    state.owned = next;
+    prefs.set(CACHE_KEY, [...next].sort((a, b) => a - b));
+    paint();
+    if (!viewer.hidden) fillViewer();
+  }
+
+  function setOwned(n, value) {
+    if (!state.owned || state.owned.has(n) === value) return;
+    const before = state.owned.size;
+    const next = new Set(state.owned);
+    value ? next.add(n) : next.delete(n);
+    pending.set(n, value);
+    savePending();
+    commit(next);
+    setSync("saving");
+    scheduleSync(1200);
+    if (before === TOTAL - 1 && next.size === TOTAL) setTimeout(celebrate, 400);
+  }
+
+  function toggle(n) {
+    if (!state.owned) { toast("Still loading your shelf. Try again in a second."); return; }
+    if (state.readonly) { toast(authBroken ? "Your token stopped working. Reconnect to save changes." : "Connect this device to change your shelf.", openConnect, "CONNECT"); return; }
+    const value = !state.owned.has(n);
+    const b = byN.get(n);
+    setOwned(n, value);
+    toast(value ? `Added #${n} ${b.title}` : `Removed #${n} ${b.title}`, () => setOwned(n, !value));
+  }
+
+  function b64decode(s) {
+    const bin = atob(s.replace(/\s/g, ""));
+    return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+  }
+  function b64encode(str) {
+    let bin = "";
+    new TextEncoder().encode(str).forEach(b => { bin += String.fromCharCode(b); });
+    return btoa(bin);
+  }
+  function ghHeaders(json, t = token) {
+    const h = { Accept: "application/vnd.github+json" };
+    if (t) h.Authorization = "Bearer " + t;
+    if (json) h["Content-Type"] = "application/json";
+    return h;
+  }
+  async function ghError(res) {
+    let msg = "";
+    try { msg = (await res.json()).message || ""; } catch {}
+    const e = new Error(msg || `GitHub answered ${res.status}`);
+    e.status = res.status;
+    e.rateLimited = res.status === 429 || (res.status === 403 && res.headers.get("x-ratelimit-remaining") === "0");
+    return e;
+  }
+
+  async function ghRead() {
+    const res = await fetch(`${API}?ref=${GH.branch}&t=${Date.now()}`, { headers: ghHeaders(), cache: "no-store" });
+    lastRead = Date.now();
+    if (res.status === 404) return { sha: null, owned: [] };
+    if (!res.ok) throw await ghError(res);
+    const j = await res.json();
+    const data = JSON.parse(b64decode(j.content));
+    return { sha: j.sha, owned: (data.owned || []).filter(n => byN.has(n)) };
+  }
+
+  async function ghWrite(owned, sha, message) {
+    const json = `{\n  "owned": ${JSON.stringify(owned)},\n  "updated": "${new Date().toISOString()}"\n}\n`;
+    const body = { message, branch: GH.branch, content: b64encode(json) };
+    if (sha) body.sha = sha;
+    const res = await fetch(API, { method: "PUT", headers: ghHeaders(true), body: JSON.stringify(body) });
+    if (!res.ok) throw await ghError(res);
+  }
+
+  function describe(changes, base) {
+    const real = [...changes].filter(([n, v]) => base.has(n) !== v).sort((a, b) => a[0] - b[0]);
+    if (real.length === 1) { const [n, v] = real[0]; return `${v ? "Add" : "Remove"} #${n} ${byN.get(n).title}`; }
+    return "Update shelf: " + real.map(([n, v]) => `${v ? "+" : "-"}#${n}`).join(", ");
+  }
+
+  function applyRemote(base) {
+    const shown = overlay(base);
+    if (!sameSet(shown, state.owned)) commit(shown);
+  }
+
+  function scheduleSync(delay) { clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, delay); }
+
+  async function syncNow() {
+    clearTimeout(syncTimer);
+    if (syncing) { syncAgain = true; return; }
+    syncing = true;
+    syncAgain = false;
+    let failed = false;
+    try {
+      for (let attempt = 0; ; attempt++) {
+        const remote = await ghRead();
+        const base = new Set(remote.owned);
+        for (const [n, v] of [...pending]) if (base.has(n) === v) pending.delete(n);
+        savePending();
+        if (!pending.size || state.readonly) { applyRemote(base); break; }
+        const changes = new Map(pending);
+        const next = new Set(base);
+        for (const [n, v] of changes) v ? next.add(n) : next.delete(n);
+        try {
+          await ghWrite([...next].sort((a, b) => a - b), remote.sha, describe(changes, base));
+        } catch (e) {
+          if ((e.status === 409 || e.status === 422) && attempt < 2) continue; // another device saved first: re-read, merge, retry
+          throw e;
+        }
+        for (const [n, v] of changes) if (pending.get(n) === v) pending.delete(n);
+        savePending();
+        applyRemote(next);
+        break;
+      }
+      lastSynced = Date.now();
+      if (state.readonly && !authBroken) setSync("viewonly");
+      else if (!authBroken) setSync(pending.size ? "saving" : "synced");
+    } catch (e) {
+      failed = true;
+      handleSyncError(e);
+    } finally {
+      syncing = false;
+      if (syncAgain) scheduleSync(300);
+      else if (pending.size && !state.readonly) scheduleSync(failed ? 15000 : 1200);
+      if (!$("connect").hidden) fillConnect();
+    }
+  }
+
+  function handleSyncError(e) {
+    if (e.status === 401) {
+      authBroken = true;
+      setSync("error", "Token expired or revoked · reconnect");
+    } else if ((e.status === 403 && !e.rateLimited) || (e.status === 404 && token)) {
+      authBroken = true;
+      setSync("error", "Token can’t edit this repo · fix it");
+      toast("Your token can read the shelf but can’t save. Give it Contents: Read and write.", openConnect, "FIX");
+    } else if (e.rateLimited) {
+      setSync("error", "GitHub asked us to slow down · retrying soon");
+    } else if (e instanceof TypeError || !navigator.onLine) {
+      setSync("offline", pending.size ? "Offline · changes will save later" : "Offline · showing your last shelf");
+    } else {
+      setSync("error", "Couldn’t reach GitHub · retrying");
+    }
+    if (authBroken) paint();
+  }
+
+  // Keep devices in step: re-read on return to the page and every 30 s while visible
+  // (every 2 minutes for visitors without a token, to stay inside GitHub's anonymous limit).
+  setInterval(() => {
+    if (document.visibilityState !== "visible" || syncing) return;
+    if (Date.now() - lastRead >= (token ? 29000 : 119000)) syncNow();
+  }, 10000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") { if (Date.now() - lastRead > 5000) syncNow(); }
+    else if (pending.size && !state.readonly) syncNow();
+  });
+  window.addEventListener("online", () => syncNow());
+
+  // Connect dialog
+  const connectEl = $("connect");
+  function fillConnect() {
+    const on = !!token && !authBroken;
+    $("connectOff").hidden = on;
+    $("connectOn").hidden = !on;
+    $("connectTitle").textContent = on ? "This device is connected" : authBroken ? "Reconnect this device" : "Connect this device";
+    const err = $("connectErr");
+    err.hidden = !authBroken;
+    if (authBroken) err.textContent = "The saved token stopped working or can’t save changes. Make a new one (steps above) and paste it here.";
+    $("connectLast").textContent = lastSynced
+      ? `Last synced ${new Date(lastSynced).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}${pending.size ? ` · ${pending.size} change${pending.size > 1 ? "s" : ""} waiting to save` : ""}.`
+      : "Not synced yet.";
+  }
+  function openConnect() {
+    hideToast();
+    fillConnect();
+    connectEl.hidden = false;
+    document.documentElement.classList.add("locked");
+    const field = $("tokenInput");
+    if (!$("connectOff").hidden) setTimeout(() => field.focus({ preventScroll: true }), 50);
+  }
+  function closeConnect() {
+    connectEl.hidden = true;
+    if (viewer.hidden) document.documentElement.classList.remove("locked");
+  }
+  $("sync").addEventListener("click", openConnect);
+  $("connectClose").addEventListener("click", closeConnect);
+  connectEl.addEventListener("click", e => { if (e.target === connectEl) closeConnect(); });
+  $("tokenInput").addEventListener("keydown", e => { if (e.key === "Enter") $("connectSave").click(); });
+  $("connectSave").addEventListener("click", async () => {
+    const btn = $("connectSave"), err = $("connectErr");
+    const t = $("tokenInput").value.trim();
+    const fail = msg => { err.textContent = msg; err.hidden = false; };
+    if (!t) { fail("Paste your token first."); return; }
+    btn.disabled = true;
+    btn.textContent = "CHECKING…";
+    try {
+      const res = await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}`, { headers: ghHeaders(false, t), cache: "no-store" });
+      if (res.status === 401) { fail("GitHub didn’t accept that token. Make sure you copied all of it."); return; }
+      if (!res.ok) { fail("That token can’t see the goosebumps-tracker repo. Pick it under Repository access."); return; }
+      token = t;
+      authBroken = false;
+      prefs.set(TOKEN_KEY, t);
+      $("tokenInput").value = "";
+      err.hidden = true;
+      closeConnect();
+      paint();
+      if (!viewer.hidden) fillViewer();
+      toast("Connected. Taps on this device now save to GitHub.");
+      syncNow();
+    } catch {
+      fail("Couldn’t reach GitHub. Check your connection and try again.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "CONNECT";
+    }
+  });
+  $("syncNowBtn").addEventListener("click", () => { syncNow(); });
+  $("disconnect").addEventListener("click", () => {
+    token = null;
+    authBroken = false;
+    prefs.set(TOKEN_KEY, null);
+    pending.clear();
+    savePending();
+    closeConnect();
+    paint();
+    toast("Disconnected. This device can still view the shelf.");
+    syncNow();
+  });
+
+  // ---------- Viewer ----------
+  let vList = [], vIdx = 0, openedAt = 0, lastFocus = null;
+
+  function openViewer(n) {
+    hidePeek();
+    const list = visibleNumbers();
+    vList = list.includes(n) ? list : BOOKS.map(b => b.n);
+    vIdx = vList.indexOf(n);
+    if (viewer.hidden) {
+      lastFocus = document.activeElement;
+      viewer.hidden = false;
+      document.documentElement.classList.add("locked");
+      openedAt = performance.now();
+    }
+    fillViewer();
+    $("vClose").focus({ preventScroll: true });
+  }
+
+  function closeViewer() {
+    if (viewer.hidden) return;
+    viewer.hidden = true;
+    document.documentElement.classList.remove("locked");
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+  }
+
+  function step(d) {
+    if (vList.length < 2) return;
+    vIdx = (vIdx + d + vList.length) % vList.length;
+    fillViewer();
+  }
+
+  function fillViewer() {
+    const n = vList[vIdx], b = byN.get(n);
+    const own = state.owned ? state.owned.has(n) : null;
+    vImg.style.backgroundImage = `url("${cover(n, "sm")}")`;
+    if (vImg.dataset.n !== String(n)) { vImg.src = cover(n, "lg"); vImg.dataset.n = n; }
+    vImg.alt = `Cover of Goosebumps #${n}, ${b.title}`;
+    vCard.classList.toggle("missing", own === false);
+    $("vStamp").hidden = own !== false;
+    $("vNo").textContent = `#${n}`;
+    $("vTitle").textContent = b.title;
+    $("vDate").textContent = b.date;
+    $("vPages").textContent = b.pages;
+    $("vArtist").textContent = b.artist;
+    const sets = SETS.filter(s => s.books.includes(n));
+    $("vSet").hidden = !sets.length || !state.owned;
+    if (sets.length && state.owned) {
+      $("vSet").textContent = sets.map(s => `${s.label[0].toUpperCase() + s.label.slice(1)}: ${s.books.filter(x => state.owned.has(x)).length} of ${s.books.length} on your shelf`).join(" · ");
+    }
+    const t = $("vToggle");
+    t.setAttribute("aria-pressed", own ? "true" : "false");
+    t.innerHTML = own ? `${CHECK}<span>ON MY SHELF</span>` : `<span>ADD TO MY SHELF</span>`;
+    t.disabled = !state.owned;
+    $("vToggleNote").textContent = !state.owned ? "Loading your shelf…" : state.readonly ? "Connect this device to change your shelf." : own ? "Tap to take it off your shelf." : "You don’t have this one yet.";
+    $("vHunt").hidden = own !== false;
+    const query = encodeURIComponent(`Goosebumps ${n} ${b.title}`);
+    $("lEbay").href = `https://www.ebay.com/sch/i.html?_nkw=${query}`;
+    $("lThrift").href = `https://www.thriftbooks.com/browse/?b.search=${query}`;
+    $("lAbe").href = `https://www.abebooks.com/servlet/SearchResults?kn=${query}`;
+    const scope = vList.length === TOTAL ? "" : state.filter === "missing" ? " missing" : state.filter === "owned" ? " owned" : " shown";
+    $("vPos").textContent = `${vIdx + 1} of ${vList.length}${scope}`;
+    $("vPrev").disabled = $("vNext").disabled = vList.length < 2;
+    // warm the neighbours
+    [vList[(vIdx + 1) % vList.length], vList[(vIdx - 1 + vList.length) % vList.length]].forEach(m => { const i = new Image(); i.src = cover(m, "lg"); });
+  }
+
+  viewer.addEventListener("click", e => {
+    if (!e.target.closest("[data-close]")) return;
+    if (performance.now() - openedAt < 450) return; // the finger lifting after a long-press
+    closeViewer();
+  });
+  $("vToggle").addEventListener("click", () => toggle(vList[vIdx]));
+  $("vPrev").addEventListener("click", () => step(-1));
+  $("vNext").addEventListener("click", () => step(1));
+  let touch = null;
+  $("vCover").addEventListener("touchstart", e => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; }, { passive: true });
+  $("vCover").addEventListener("touchend", e => {
+    if (!touch) return;
+    const t = e.changedTouches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y;
+    touch = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) step(dx < 0 ? 1 : -1);
+  });
+
+  // ---------- Shelf interactions ----------
+  let press = null, pressFired = false;
+  shelf.addEventListener("pointerdown", e => {
+    const book = e.target.closest(".book");
+    if (!book || e.button > 0) return;
+    pressFired = false;
+    clearTimeout(press && press.t);
+    press = { x: e.clientX, y: e.clientY, t: setTimeout(() => {
+      pressFired = true;
+      if (navigator.vibrate) { try { navigator.vibrate(12); } catch {} }
+      openViewer(+book.dataset.n);
+    }, 480) };
+  });
+  const cancelPress = () => { if (press) clearTimeout(press.t); };
+  shelf.addEventListener("pointerup", cancelPress);
+  shelf.addEventListener("pointercancel", cancelPress);
+  shelf.addEventListener("pointermove", e => { if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 10) clearTimeout(press.t); });
+  shelf.addEventListener("click", e => {
+    if (pressFired) { pressFired = false; e.preventDefault(); return; }
+    const btn = e.target.closest("[data-act]");
+    if (!btn) return;
+    const n = +btn.closest(".book").dataset.n;
+    if (btn.dataset.act === "view") openViewer(n); else toggle(n);
+  });
+  shelf.addEventListener("contextmenu", e => {
+    const book = e.target.closest(".book");
+    if (!book) return;
+    e.preventDefault();
+    if (viewer.hidden) openViewer(+book.dataset.n);
+  });
+
+  // Desktop: hover a list thumbnail to peek at the cover
+  const peek = $("peek"), peekImg = $("peekImg");
+  function showPeek(thumb, n) {
+    peekImg.style.backgroundImage = `url("${cover(n, "sm")}")`;
+    peekImg.src = cover(n, "lg");
+    const r = thumb.getBoundingClientRect(), w = 220, h = 325;
+    let left = r.right + 14;
+    if (left + w > innerWidth - 12) left = Math.max(12, r.left - w - 14);
+    const top = Math.min(Math.max(12, r.top + r.height / 2 - h / 2), innerHeight - h - 12);
+    peek.style.left = left + "px";
+    peek.style.top = top + "px";
+    peek.hidden = false;
+    requestAnimationFrame(() => peek.classList.add("show"));
+  }
+  function hidePeek() { peek.classList.remove("show"); peek.hidden = true; }
+  shelf.addEventListener("pointerover", e => {
+    if (e.pointerType !== "mouse" || !canHover.matches || state.view !== "list") return;
+    const th = e.target.closest(".thumb");
+    if (th) showPeek(th, +th.closest(".book").dataset.n);
+  });
+  shelf.addEventListener("pointerout", e => {
+    const th = e.target.closest(".thumb");
+    if (th && !th.contains(e.relatedTarget)) hidePeek();
+  });
+  window.addEventListener("scroll", hidePeek, { passive: true });
+
+  // Tabs, layout, search, sets
+  document.querySelector(".tabs").addEventListener("click", e => {
+    const b = e.target.closest("[data-filter]");
+    if (!b) return;
+    state.filter = b.dataset.filter;
+    prefs.set("gb.filter", state.filter);
+    applyVisibility();
+  });
+  document.querySelector(".viewtoggle").addEventListener("click", e => {
+    const b = e.target.closest("[data-view-mode]");
+    if (!b || b.dataset.viewMode === state.view) return;
+    state.view = b.dataset.viewMode;
+    prefs.set("gb.view", state.view);
+    renderShelf();
+    paintHint();
+  });
+  let slappyShown = false;
+  $("q").addEventListener("input", e => {
+    state.q = e.target.value;
+    applyVisibility();
+    if (norm(state.q) === "slappy") { if (!slappyShown) { slappyShown = true; summonDummy(); } }
+    else slappyShown = false;
+  });
+  $("q").addEventListener("keydown", e => { if (e.key === "Escape") { e.target.value = ""; state.q = ""; applyVisibility(); } });
+  $("sets").addEventListener("click", e => {
+    const b = e.target.closest("[data-set]");
+    if (!b) return;
+    state.set = state.set === b.dataset.set ? null : b.dataset.set;
+    paint();
+    if (state.set && window.matchMedia("(max-width: 899px)").matches) $("main").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("clearSet").addEventListener("click", () => { state.set = null; paint(); });
+  $("emptyClear").addEventListener("click", () => {
+    state.filter = "all"; state.set = null; state.q = ""; $("q").value = "";
+    prefs.set("gb.filter", "all");
+    paint();
+  });
+  $("nextHunt").addEventListener("click", () => {
+    const next = state.owned && BOOKS.find(b => !state.owned.has(b.n));
+    if (next) openViewer(next.n);
+  });
+
+  // Want list
+  $("copyWant").addEventListener("click", () => {
+    if (!state.owned) return;
+    const miss = BOOKS.filter(b => !state.owned.has(b.n));
+    const text = `Goosebumps want list (${miss.length})\n` + miss.map(b => `#${b.n} ${b.title}`).join("\n");
+    const fallback = () => { $("copyText").value = text; $("copybox").hidden = false; $("copyText").focus(); $("copyText").select(); };
+    try {
+      navigator.clipboard.writeText(text).then(() => toast(`Copied ${miss.length} missing books`), fallback);
+    } catch { fallback(); }
+  });
+  $("copyDone").addEventListener("click", () => { $("copybox").hidden = true; });
+
+  // Toast
+  const toastEl = $("toast");
+  let toastTimer = 0;
+  function toast(msg, undo, label) {
+    $("toastText").textContent = msg;
+    const u = $("toastUndo");
+    u.hidden = !undo;
+    u.textContent = label || "UNDO";
+    u.onclick = undo ? () => { undo(); hideToast(); } : null;
+    toastEl.hidden = false;
+    requestAnimationFrame(() => toastEl.classList.add("show"));
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, undo ? 5000 : 3200);
+  }
+  function hideToast() {
+    toastEl.classList.remove("show");
+    setTimeout(() => { if (!toastEl.classList.contains("show")) toastEl.hidden = true; }, 250);
+  }
+
+  // Facts
+  let factIdx = Math.floor(Math.random() * FACTS.length);
+  const showFact = () => { $("fact").textContent = FACTS[factIdx]; };
+  $("nextFact").addEventListener("click", () => { factIdx = (factIdx + 1) % FACTS.length; showFact(); });
+
+  // ---------- Easter eggs ----------
+  const dummy = $("dummy");
+  let dT1 = 0, dT2 = 0;
+  function dummyLines() {
+    const o = state.owned;
+    if (!o) return ["Hahaha! Can’t count your books in the dark?"];
+    const missing = TOTAL - o.size;
+    if (!missing) return ["All 62? Then you work for ME now. Hahaha!", "A complete shelf. I’ll be watching it. Every night."];
+    const next = BOOKS.find(b => !o.has(b.n));
+    const lines = [
+      `Hey, dummy! You’re still missing ${missing} book${missing > 1 ? "s" : ""}.`,
+      `Hahaha! ${o.size} down, ${missing} to go.`,
+      `Want some advice? Go find #${next.n}, ${next.title}.`,
+    ];
+    if (!o.has(31)) lines.push("No #31 on your shelf? That’s MY big comeback, dummy!");
+    return lines;
+  }
+  function summonDummy() {
+    const lines = dummyLines();
+    $("dummyText").textContent = lines[Math.floor(Math.random() * lines.length)];
+    dummy.hidden = false;
+    void dummy.offsetWidth;
+    dummy.classList.add("up", "talk");
+    clearTimeout(dT1); clearTimeout(dT2);
+    dT1 = setTimeout(() => dummy.classList.remove("talk"), 2400);
+    dT2 = setTimeout(hideDummy, 7000);
+  }
+  function hideDummy() {
+    dummy.classList.remove("up", "talk");
+    setTimeout(() => { if (!dummy.classList.contains("up")) dummy.hidden = true; }, 520);
+  }
+  dummy.addEventListener("click", hideDummy);
+
+  let taps = [];
+  $("wordmark").addEventListener("click", () => {
+    const now = Date.now();
+    taps = taps.filter(t => now - t < 1500);
+    taps.push(now);
+    if (taps.length >= 3) { taps = []; summonDummy(); }
+  });
+
+  let typed = "";
+  document.addEventListener("keydown", e => {
+    if (!$("connect").hidden) { if (e.key === "Escape") closeConnect(); return; }
+    if (!viewer.hidden) {
+      if (e.key === "Escape") closeViewer();
+      else if (e.key === "ArrowRight") step(1);
+      else if (e.key === "ArrowLeft") step(-1);
+      else if (e.key === "Tab") {
+        const f = [...vCard.querySelectorAll("button:not([disabled]), a[href]")].filter(x => x.offsetParent !== null);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+      return;
+    }
+    if (e.key === "Escape" && !$("celebrate").hidden) { $("celebrate").hidden = true; return; }
+    const inField = /^(INPUT|TEXTAREA)$/.test(document.activeElement && document.activeElement.tagName);
+    if (inField || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "/") { e.preventDefault(); $("q").focus(); return; }
+    if (e.key.length === 1) {
+      typed = (typed + e.key.toLowerCase()).slice(-6);
+      if (typed === "slappy") { typed = ""; summonDummy(); }
+    }
+  });
+
+  function paintMidnight() {
+    const late = new Date().getHours() < 4;
+    $("fog").hidden = !late;
+    const chip = $("midnightChip");
+    chip.hidden = !late;
+    if (late) chip.textContent = state.owned && !state.owned.has(54)
+      ? "It’s after midnight. Don’t Go to Sleep! (#54 is still missing.)"
+      : "It’s after midnight. Don’t Go to Sleep!";
+  }
+  setInterval(paintMidnight, 5 * 60 * 1000);
+
+  (function halloween() {
+    const d = new Date();
+    if (d.getMonth() !== 9) return;
+    const left = 31 - d.getDate();
+    $("halloweenText").textContent = left === 0 ? "Happy Halloween!" : `${left} night${left === 1 ? "" : "s"} until Halloween`;
+    $("halloweenChip").hidden = false;
+    if (left === 0) document.documentElement.classList.add("halloween");
+  })();
+
+  function celebrate() {
+    const c = $("curtain");
+    c.innerHTML = "";
+    const count = Math.max(10, Math.round(innerWidth / 30));
+    for (let i = 0; i < count; i++) {
+      const d = document.createElement("i");
+      d.style.left = (i / count * 100 + Math.random() * 2) + "%";
+      d.style.width = (14 + Math.random() * 26) + "px";
+      d.style.setProperty("--h", (22 + Math.random() * 55) + "vh");
+      d.style.animationDelay = (Math.random() * 0.7).toFixed(2) + "s";
+      c.appendChild(d);
+    }
+    $("celebrate").hidden = false;
+    $("celClose").focus();
+  }
+  $("celClose").addEventListener("click", () => { $("celebrate").hidden = true; });
+
+  // ---------- Boot ----------
+  setSync(state.owned ? "syncing" : "loading");
+  showFact();
+  paintHint();
+  if (canHover.addEventListener) canHover.addEventListener("change", paintHint);
+  renderShelf();
+  syncNow();
+})();
+</script>
+</body>
+</html>

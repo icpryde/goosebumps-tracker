@@ -1,0 +1,15 @@
+{
+  "name": "Goosebumps Tracker",
+  "short_name": "Goosebumps",
+  "description": "All 62 original Goosebumps books: which ones I own and which ones I still need.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1c1335",
+  "theme_color": "#1c1335",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
