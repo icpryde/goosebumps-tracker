@@ -37,6 +37,7 @@ img{max-width:100%}
   --dusk:#b2a6cf;
   --dim:#8d80ad;
   --slime:#97e53e;
+  --slime-hi:#c6f882;
   --slime-deep:#4c8c17;
   --ink-slime:#152609;
   --pumpkin:#ff9d42;
@@ -135,18 +136,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .bigcount .pct{margin-left:auto;font-family:var(--f-label);font-weight:700;font-size:20px;color:var(--slime);font-variant-numeric:tabular-nums}
 .complete-badge{font-family:var(--f-label);font-weight:800;letter-spacing:.18em;font-size:13px;color:var(--ink-slime);background:var(--slime);padding:4px 8px;border-radius:4px;transform:rotate(-4deg)}
 
-.tube{position:relative;height:40px}
-.track{position:relative;height:22px;border-radius:999px;background:var(--night);border:1px solid var(--line);overflow:hidden;box-shadow:inset 0 2px 6px var(--shade)}
-.goo{
-  position:absolute;inset:0 auto 0 0;width:0;
-  background:linear-gradient(180deg, #b6f56c 0%, var(--slime) 38%, var(--slime-deep) 100%);
-  border-radius:999px;transition:width .9s cubic-bezier(.3,.9,.3,1.1);
-}
-.goo::after{content:"";position:absolute;left:10px;right:14px;top:4px;height:4px;border-radius:4px;background:rgba(255,255,255,.35)}
-.drips{position:absolute;left:0;right:0;top:20px;height:20px;pointer-events:none}
-.drips i{position:absolute;top:0;width:8px;border-radius:0 0 8px 8px;background:linear-gradient(180deg,var(--slime),var(--slime-deep));transform-origin:top;animation:ooze 3.6s ease-in-out infinite}
-.drips i::after{content:"";position:absolute;left:50%;bottom:-3px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--slime-deep)}
-@keyframes ooze{0%,100%{transform:scaleY(.8)}50%{transform:scaleY(1.15)}}
 
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin:0}
 .stats div{display:flex;flex-direction:column;gap:1px;min-width:0}
@@ -390,6 +379,57 @@ main{min-width:0}
 .pane-actions{display:flex;flex-wrap:wrap;gap:8px}
 .ghost-btn.danger{color:var(--pumpkin);border-color:rgba(255,157,66,.45)}
 
+/* Slime meter */
+.tube{position:relative;height:64px;margin-bottom:-12px}
+.meter-svg{display:block}
+.m-track{fill:var(--night);stroke:var(--line);stroke-width:1}
+.m-goo{fill:url(#gb-slime-grad)}
+.m-fizz circle{fill:rgba(255,255,255,.55)}
+.m-shine{fill:rgba(255,255,255,.4)}
+.m-lead{transform-box:fill-box;transform-origin:center;animation:lead 2.6s ease-in-out infinite}
+.bump{transform-box:fill-box;transform-origin:center;animation:bob 3.4s ease-in-out infinite}
+.bubble{transform-box:fill-box;transform-origin:center;opacity:0;animation:fizz 3.6s ease-in infinite}
+@keyframes lead{50%{transform:scale(1.14,1.06)}}
+@keyframes bob{50%{transform:translateY(-1.6px) scale(1.08)}}
+@keyframes fizz{0%{transform:translate(0,3px) scale(.6);opacity:0}25%{opacity:.85}100%{transform:translate(7px,-4px) scale(1.1);opacity:0}}
+
+/* Drips: stretch down, snap off, fall. Shared by the meter and the cover panel's edge. */
+.drip .stem,.drip .bulb{transform-box:fill-box;animation-duration:var(--dur);animation-delay:var(--delay);animation-iteration-count:infinite;animation-timing-function:cubic-bezier(.45,0,.75,.55)}
+.drip .stem{transform-origin:50% 0}
+.drip .bulb{transform-origin:50% 50%}
+.d1 .stem{animation-name:stem1}.d1 .bulb{animation-name:bulb1}
+.d2 .stem{animation-name:stem2}.d2 .bulb{animation-name:bulb2}
+.d3 .stem{animation-name:stem3}.d3 .bulb{animation-name:bulb3}
+@keyframes stem1{0%,6%{transform:scaleY(.7)}62%{transform:scaleY(2.4)}72%{transform:scaleY(.9)}100%{transform:scaleY(.7)}}
+@keyframes bulb1{0%,6%{transform:translateY(0) scale(.75)}62%{transform:translateY(14px) scale(1)}72%{transform:translateY(20px) scale(.95)}88%{transform:translateY(32px) scale(.7)}100%{transform:translateY(40px) scale(0)}}
+@keyframes stem2{0%,6%{transform:scaleY(.7)}62%{transform:scaleY(3.2)}72%{transform:scaleY(1)}100%{transform:scaleY(.7)}}
+@keyframes bulb2{0%,6%{transform:translateY(0) scale(.75)}62%{transform:translateY(22px) scale(1.05)}72%{transform:translateY(28px) scale(1)}88%{transform:translateY(38px) scale(.7)}100%{transform:translateY(44px) scale(0)}}
+@keyframes stem3{0%,6%{transform:scaleY(.7)}64%{transform:scaleY(4)}74%{transform:scaleY(1.1)}100%{transform:scaleY(.7)}}
+@keyframes bulb3{0%,6%{transform:translateY(0) scale(.75)}64%{transform:translateY(30px) scale(1.1)}74%{transform:translateY(35px) scale(1)}90%{transform:translateY(42px) scale(.6)}100%{transform:translateY(46px) scale(0)}}
+
+/* Cover panel: owned glows slime green with goo along the top; missing glows pumpkin */
+.v-card{border-width:2px;transition:border-color .3s, box-shadow .3s}
+.v-card.owned{border-color:var(--slime);box-shadow:0 0 0 1px rgba(151,229,62,.22), 0 0 54px rgba(151,229,62,.2)}
+.v-card.missing{border-color:rgba(255,157,66,.75);box-shadow:0 0 0 1px rgba(255,157,66,.2), 0 0 54px rgba(255,157,66,.13)}
+.v-slime{position:absolute;left:0;top:0;right:0;height:64px;pointer-events:none;z-index:0;overflow:hidden}
+.v-slime svg{display:block}
+.edge-goo{fill:var(--slime)}
+.v-cover,.v-info{position:relative;z-index:1}
+.v-close{z-index:2}
+.v-story{background:var(--night);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.v-story p{margin:0;font-size:15px;line-height:1.5;text-wrap:pretty}
+.owned .v-story{border-color:rgba(151,229,62,.3)}
+.missing .v-story{border-color:rgba(255,157,66,.3)}
+.v-isbn{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-variant-numeric:tabular-nums}
+.mini-btn{border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 10px;min-height:28px;font-family:var(--f-label);font-weight:700;font-size:13px;letter-spacing:.06em;color:var(--dusk)}
+.mini-btn:hover{color:var(--bone);border-color:var(--dusk)}
+
+/* A small drip under each owned checkmark */
+.shelf.list .tick{position:relative}
+.is-owned .tick::before,.is-owned .tick::after{content:"";position:absolute;background:var(--slime);pointer-events:none}
+.is-owned .tick::before{left:calc(50% + 2px);top:calc(100% - 5px);width:5px;height:9px;border-radius:2.5px}
+.is-owned .tick::after{left:calc(50% + 1px);top:calc(100% + 1px);width:7px;height:8px;border-radius:50% 50% 50% 50% / 42% 42% 58% 58%}
+
 /* Easter eggs */
 .dummy{position:fixed;right:10px;bottom:0;z-index:50;display:flex;align-items:flex-end;gap:4px;transform:translateY(105%);transition:transform .5s cubic-bezier(.2,1.3,.4,1);cursor:pointer;padding-bottom:env(safe-area-inset-bottom, 0px)}
 .dummy.up{transform:none}
@@ -427,6 +467,25 @@ main{min-width:0}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gb-slime-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color:var(--slime-hi)"/>
+      <stop offset=".45" style="stop-color:var(--slime)"/>
+      <stop offset="1" style="stop-color:var(--slime-deep)"/>
+    </linearGradient>
+    <filter id="gb-goo" x="-20%" y="-40%" width="140%" height="200%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -8" result="goo"/>
+      <feGaussianBlur in="goo" stdDeviation="1.6" result="soft"/>
+      <feSpecularLighting in="soft" surfaceScale="2.8" specularConstant="1.1" specularExponent="34" lighting-color="#ffffff" result="spec">
+        <feDistantLight azimuth="235" elevation="45"/>
+      </feSpecularLighting>
+      <feComposite in="spec" in2="goo" operator="in" result="gloss"/>
+      <feComposite in="goo" in2="gloss" operator="arithmetic" k1="0" k2="1" k3="0.7" k4="0"/>
+    </filter>
+  </defs>
+</svg>
 
 <div class="app">
   <header class="masthead">
@@ -452,10 +511,7 @@ main{min-width:0}
           <span class="complete-badge" id="completeBadge" hidden>COMPLETE</span>
           <span class="pct" id="pctBig"></span>
         </div>
-        <div class="tube" aria-hidden="true">
-          <div class="track"><div class="goo" id="goo"></div></div>
-          <div class="drips" id="drips"></div>
-        </div>
+        <div class="tube" id="tube" aria-hidden="true"></div>
         <dl class="stats">
           <div class="owned"><dt>Owned</dt><dd id="stOwned">–</dd></div>
           <div class="missing"><dt>Missing</dt><dd id="stMissing">–</dd></div>
@@ -528,6 +584,7 @@ main{min-width:0}
 <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vTitle" hidden>
   <div class="v-backdrop" data-close></div>
   <div class="v-card" id="vCard">
+    <div class="v-slime" id="vSlime" hidden></div>
     <button class="v-close" type="button" data-close aria-label="Close" id="vClose">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </button>
@@ -538,10 +595,12 @@ main{min-width:0}
     <div class="v-info">
       <div class="v-no" id="vNo"></div>
       <h2 class="v-title" id="vTitle"></h2>
+      <div class="v-story"><span class="label">The story</span><p id="vStory"></p></div>
       <dl class="v-meta">
         <dt>Published</dt><dd id="vDate"></dd>
         <dt>Pages</dt><dd id="vPages"></dd>
         <dt>Cover art</dt><dd id="vArtist"></dd>
+        <dt title="First Scholastic printing">ISBN</dt><dd class="v-isbn"><span id="vIsbn"></span><button class="mini-btn" id="vIsbnCopy" type="button" aria-label="Copy ISBN">COPY</button></dd>
       </dl>
       <p class="v-set" id="vSet" hidden></p>
       <button class="v-toggle" id="vToggle" type="button" aria-pressed="false"></button>
@@ -758,6 +817,87 @@ main{min-width:0}
     "Two books came out in July 1992 to launch the series: #1 Welcome to Dead House and #2 Stay Out of the Basement.",
   ];
 
+  // Spoiler-free premises, written for this page from each book's setup.
+  const STORIES = {
+    1: "Amanda and Josh move into a huge old house their dad inherited in Dark Falls, a town where the trees block out the sun. The neighbors are friendly. A little too friendly.",
+    2: "Ever since he lost his job, Dr. Brewer spends all his time on plant experiments in the basement. Margaret and Casey aren’t allowed down there, and their dad is starting to act very strange.",
+    3: "Stuck at his odd great-aunt’s house, Evan buys a dusty can of glowing green slime at an old toy store. It bounces, it stretches, and it keeps getting bigger.",
+    4: "Greg finds an old camera hidden in the basement of the creepy Coffman House. Every photo it takes shows something terrible that hasn’t happened yet.",
+    5: "On a trip to Egypt, Gabe follows his archaeologist uncle into the tunnels under a pyramid. He gets lost in the dark, and something in the tomb starts to move.",
+    6: "At Max’s birthday party, the kids find an old mirror in the attic. Pull the light chain and you vanish. Turning invisible becomes a game, until coming back gets harder each time.",
+    7: "Twin sisters Lindy and Kris each end up with a ventriloquist’s dummy, and the rivalry starts. Then one of the dummies starts doing things on its own.",
+    8: "Lucy loves scaring her little brother with monster stories. So when she sees the town librarian turn into a monster, nobody believes a word she says.",
+    9: "Billy’s summer at Camp Nightmoon is strange from day one. Campers keep disappearing, the rules make no sense, and the counselors don’t seem to care.",
+    10: "Hannah’s summer is lonely until a boy named Danny moves in next door. He seems nice, but he keeps appearing and vanishing out of nowhere. Could he be a ghost?",
+    11: "Tired of being called a scaredy-cat, Carly Beth buys the ugliest mask in a strange party store for Halloween. It works too well, and it won’t come off.",
+    12: "Clumsy Samantha is fed up with the class bully. Then a mysterious woman named Clarissa offers her three wishes, and each one goes wrong in a way Sam never saw coming.",
+    13: "Jerry finds an old piano in the attic of his family’s new house and hears it playing by itself at night. Then he starts lessons with a very odd teacher.",
+    14: "Grady’s family moves to the edge of a Florida swamp. At night something howls out there, and the locals whisper about a werewolf.",
+    15: "Eddie and his friends are sick of Courtney, who is never scared of anything. Their plan to finally scare her involves a local legend about mud monsters.",
+    16: "Lost on a road trip, the Morris family stumbles onto a theme park called HorrorLand. The rides are terrifying, and the costumed Horrors look awfully real.",
+    17: "Gary is tired of being picked on and tired of being Gary. A company promises to swap his body with someone else’s for a week. Something gets mixed up.",
+    18: "Evan brings some Monster Blood to his new school, and the class hamster, Cuddles, eats it. Cuddles starts to grow. And grow.",
+    19: "Billy and Sheena spend the summer on their uncle’s research boat in the Caribbean, where Billy has a close call with something huge on the reef. Then a zoo offers their uncle a fortune to catch a mermaid.",
+    20: "Jodie and Mark visit their grandparents’ farm, but something has changed. The farmhand keeps reading from a book of superstitions, and the new scarecrows seem to move at night.",
+    21: "Todd loves worms and uses them for pranks and science projects. Then the worms start fighting back.",
+    22: "Jerry and Terri spend the summer with distant cousins in New England, near an old graveyard and a cave on the beach. Three local kids warn them the cave is haunted.",
+    23: "Gabe returns to Egypt to watch his uncle open a long-sealed tomb. He brings his good-luck charm, a mummy’s hand, and it’s acting very strange.",
+    24: "Brooke and Zeke land the leads in the school play, The Phantom. Supposedly the play is cursed, and someone, or something, seems to be hiding under the stage.",
+    25: "Comic-book fan Skipper finds a building that looks exactly like the Masked Mutant’s secret headquarters from his favorite series. He goes inside to look around.",
+    26: "Larry and his band are getting ready for a Battle of the Bands when he tries an old bottle of tanning cream. Soon thick hair is sprouting all over him.",
+    27: "Sue and Eddie get separated from their tour group in London’s ancient Terror Tower. Now a man dressed all in black is chasing them through the halls.",
+    28: "Michael’s dad brings home a rare antique cuckoo clock and warns everyone not to touch it. Michael messes with it to get back at his bratty sister, and time starts running the wrong way.",
+    29: "Evan gets stuck babysitting his know-it-all cousin Kermit, a kid scientist with a lab in his basement. Mix Kermit’s experiments with Monster Blood and things get huge.",
+    30: "Kat’s dog finds a sponge under the sink in their new house. It has eyes, it breathes, and ever since it showed up, bad luck follows Kat everywhere.",
+    31: "Amy’s old dummy finally falls apart, so her dad buys her a new one: Slappy. Soon someone is wrecking the house, and everyone blames Amy.",
+    32: "Cooper’s family moves to a house in the Maine woods. At night he hears dogs barking, even though there isn’t another house for miles.",
+    33: "Wendy and Elliot end up at a sports camp where everyone has to win. The winners get a special prize, and nobody seems to see them again.",
+    34: "Joe’s dad buys two lawn gnomes for his prize garden. Then gardens all over the neighborhood get wrecked, and the gnomes never seem to be where they were left.",
+    35: "Erin and Marty get to be the first kids to ride through a theme park based on their favorite horror movies. The monsters are only robots. Supposedly.",
+    36: "Steve wants revenge on the first graders he’s stuck coaching, so he sneaks into the party store for a scary mask of his own. The old man mask he grabs starts to change him.",
+    37: "Duane and Stephanie love scaring people and know every story about Hill House. On a tour, they go looking for the headless ghost’s missing head.",
+    38: "Jordan has never seen snow. His photographer dad takes the family to Alaska to hunt for a legendary snow beast, and they come home with more than pictures.",
+    39: "Mark’s explorer aunt sends him a hundred-year-old shrunken head from the jungles of Baladora. It whispers his name at night, and that’s only the beginning.",
+    40: "Trina and Dan’s dad collects dummies, and he just found a new one in a dumpster. Trina reads the strange words in its pocket out loud.",
+    41: "Tim wants to be a magician like his hero, Amaz-O. He sneaks backstage at Amaz-O’s show and takes the great magician’s bag of tricks. The bag has a mind of its own.",
+    42: "Dana finds a strange, veiny green egg at his sister’s egg hunt and hides it in his room. Then it hatches.",
+    43: "Ginger and her twin brothers get lost in the woods and run into giant blue creatures who want to play a game. The rules are weird, and the losers get eaten.",
+    44: "Greg tells his class about the evil camera and nobody believes him. So he tracks it down to prove the story is true, and the pictures start causing trouble all over again.",
+    45: "Harry and Alex arrive at Camp Spirit Moon, where the counselors love ghost stories and the campers act very strange. Harry wants to know what’s really going on.",
+    46: "Gretchen and her stepbrother stay at their grandparents’ creepy old house in the middle of a swamp. There’s a locked room upstairs, and something in it is very hungry.",
+    47: "Justin and Marissa follow their dad into the forests of Brovania to search for the Lost Legend, a priceless manuscript locked in a silver chest. They aren’t the only ones looking.",
+    48: "Drew and Walker plan the ultimate Halloween payback on the kids who always ruin their night. Then two strangers in pumpkin-head costumes join their trick-or-treating.",
+    49: "Freddy and Cara find a hidden door in Freddy’s basement and a dusty bottle labeled Vampire Breath. Opening it is a very bad idea.",
+    50: "Ricky gets back at the school newspaper by sneaking in a fake ad: Calling all Creeps. Then real Creeps start answering it.",
+    51: "Jaclyn and her aunt move to a tiny snowy village near the Arctic Circle. An old poem her mother used to read her about a snowman starts to sound like a warning.",
+    52: "Jack finds a formula in an old book that lets him fly, and suddenly he’s the star he always wanted to be. Then his rival Wilson learns the trick too.",
+    53: "Crystal and her brother get on the wrong side of a woman everyone in town calls a witch. Soon they start clucking, pecking and sprouting feathers.",
+    54: "Matt sneaks into the guest room to sleep. Every time he wakes up, he’s in a different version of his life, and he has to find his way back.",
+    55: "Zackie finds an old typewriter in a storm-wrecked shop. Whatever he types on it comes true, including the blob monster from his latest story.",
+    56: "Sarah hates swimming, and now she’s stuck at a water-sports camp where nobody likes her. Then she meets a ghostly girl from the lake who wants a friend.",
+    57: "Sammy loves science fiction, so nobody believes him when an invisible boy moves into his room. He’s friendly at first, but he won’t leave.",
+    58: "Billy and Sheena are back on their uncle’s boat, where an experiment is turning sea creatures giant. Billy feeds some of it to his pet goldfish.",
+    59: "Tommy is new at Bell Valley Middle School and keeps hearing voices in the empty halls. Then he finds a room dedicated to the Class of 1947, a whole class that vanished.",
+    60: "Alex visits his aunt and uncle in Wolf Creek, hoping to photograph something scary for a contest. He’s warned to stay away from the run-down house next door.",
+    61: "Marco gets hit in the head with a softball bat. Then a voice on the phone says his name is Keith, and that he lives in Marco’s basement.",
+    62: "Evan stays with his cousin Kermit, whose basement lab now has tarantulas and a new batch of blue Monster Blood. This kind multiplies.",
+  };
+
+  // Original Scholastic first-printing ISBN-10s, checked against Open Library.
+  const ISBN = {
+    1: "0590453653", 2: "0590453661", 3: "059045367X", 4: "0590453688", 5: "0590453696", 6: "059045370X",
+    7: "0590466178", 8: "0590466186", 9: "0590466194", 10: "0590494457", 11: "0590494465", 12: "0590494473",
+    13: "0590494481", 14: "059049449X", 15: "0590494503", 16: "0590477382", 17: "0590477390", 18: "0590477404",
+    19: "0590477412", 20: "0590477420", 21: "0590477439", 22: "0590477447", 23: "0590477455", 24: "0590483544",
+    25: "0590483552", 26: "0590483501", 27: "059048351X", 28: "0590483528", 29: "0590483471", 30: "059048348X",
+    31: "0590483498", 32: "0590483447", 33: "0590483455", 34: "0590483463", 35: "0590483404", 36: "0590568736",
+    37: "0590568744", 38: "0590568752", 39: "0590568760", 40: "0590568779", 41: "0590568787", 42: "0590568795",
+    43: "0590568809", 44: "0590568817", 45: "0590568825", 46: "0590568833", 47: "0590568841", 48: "059056885X",
+    49: "0590568868", 50: "0590568876", 51: "0590568884", 52: "0590568892", 53: "0590568906", 54: "0590568914",
+    55: "0590568922", 56: "0590568930", 57: "0590568949", 58: "0590568957", 59: "0590568973", 60: "0590390538",
+    61: "0590399861", 62: "059039987X",
+  };
+
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   const pad = n => String(n).padStart(2, "0");
   const cover = (n, size) => `covers/${size}/${pad(n)}.webp`;
@@ -863,11 +1003,7 @@ main{min-width:0}
     $("nOwned").textContent = o ? owned : "–";
     $("nMissing").textContent = o ? missing : "–";
 
-    $("goo").style.width = pct + "%";
-    const drips = $("drips");
-    drips.innerHTML = [[6, 12], [17, 18], [29, 9], [43, 15], [56, 20], [70, 10], [84, 16], [95, 12]]
-      .filter(([x]) => x <= pct - 3)
-      .map(([x, h], i) => `<i style="left:${x}%;height:${h}px;animation-delay:${(i * 0.45).toFixed(2)}s"></i>`).join("");
+    setMeter(o ? owned / TOTAL * 100 : 0);
 
     const next = o && BOOKS.find(b => !o.has(b.n));
     $("nextHunt").hidden = !next;
@@ -1211,6 +1347,120 @@ main{min-width:0}
     syncNow();
   });
 
+  // ---------- Slime (goo filter #gb-goo merges the shapes into one glossy blob) ----------
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // One hanging drip: a stem that stretches down with a bulb on the end. The CSS
+  // animation (d1/d2/d3) stretches it, snaps the bulb off, and lets it fall.
+  function dripMarkup(cx, top, kind, dur, delay, scale = 1) {
+    if (kind === "nub") return `<ellipse cx="${cx}" cy="${top + 2}" rx="${(5 * scale).toFixed(1)}" ry="${(6 * scale).toFixed(1)}"/>`;
+    const w = 7.5 * scale, r = 5.4 * scale;
+    return `<g class="drip ${kind}" style="--dur:${dur}s;--delay:${delay}s">` +
+      `<rect class="stem" x="${(cx - w / 2).toFixed(1)}" y="${top - 6}" width="${w.toFixed(1)}" height="10" rx="${(w / 2).toFixed(1)}"/>` +
+      `<circle class="bulb" cx="${cx}" cy="${top + 4}" r="${r.toFixed(1)}"/></g>`;
+  }
+
+  // Meter: drip slots sit at fixed spots along the tube and only show under the slime.
+  const METER_DRIPS = [[0.05, "nub"], [0.12, "d2", 4.4, -0.6], [0.22, "d1", 3.4, -2.1], [0.31, "nub"], [0.4, "d3", 5.8, -3.8],
+    [0.5, "d1", 3.9, -1.2], [0.58, "nub"], [0.66, "d2", 4.9, -4.1], [0.76, "d3", 6.3, -0.4], [0.85, "d1", 3.6, -2.7], [0.93, "nub"]];
+  const METER_BUMPS = [0.09, 0.17, 0.27, 0.36, 0.47, 0.55, 0.64, 0.73, 0.82, 0.9];
+  let meter = null, meterPct = 0, meterAnim = 0;
+
+  function buildMeter() {
+    const host = $("tube");
+    const W = Math.max(140, Math.round(host.clientWidth || 260)), H = 64, top = 21;
+    let bumps = "", drips = "", fizz = "";
+    METER_BUMPS.forEach((f, i) => {
+      const x = Math.round(f * W);
+      bumps += `<circle class="bump" data-x="${x}" cx="${x}" cy="8.5" r="${3 + (i % 3)}" style="animation-delay:${(-i * 0.7).toFixed(1)}s"/>`;
+    });
+    METER_DRIPS.forEach(([f, kind, dur, delay]) => {
+      const x = Math.round(f * W);
+      drips += `<g data-x="${x}">${dripMarkup(x, top, kind, dur, delay)}</g>`;
+    });
+    for (let i = 0; i < 8; i++) {
+      const x = Math.round((0.06 + i * 0.12) * W);
+      fizz += `<circle class="bubble" data-x="${x}" cx="${x}" cy="${12 + (i % 3) * 3}" r="${(1.3 + (i % 2) * 0.9).toFixed(1)}" style="animation-delay:${(-i * 1.1).toFixed(1)}s;animation-duration:${3 + (i % 3)}s"/>`;
+    }
+    host.innerHTML = `<svg class="meter-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">
+      <rect class="m-track" x="0.5" y="4.5" width="${W - 1}" height="22" rx="11"/>
+      <g class="m-goo" filter="url(#gb-goo)">
+        <rect class="m-bar" x="3" y="7" height="16" rx="8" width="0"/>
+        <circle class="m-lead" cx="0" cy="15" r="9.5"/>
+        ${bumps}${drips}
+      </g>
+      <g class="m-fizz">${fizz}</g>
+      <rect class="m-shine" x="10" y="9.6" height="2.6" rx="1.3" width="0"/>
+    </svg>`;
+    const svg = host.firstElementChild;
+    meter = { W, svg, bar: svg.querySelector(".m-bar"), lead: svg.querySelector(".m-lead"), shine: svg.querySelector(".m-shine"),
+      slots: [...svg.querySelectorAll("[data-x]")], painted: meter ? meter.painted : false };
+    applyMeter(meterPct);
+  }
+
+  function applyMeter(pct) {
+    if (!meter) return;
+    const fillW = pct <= 0 ? 0 : Math.max(20, (meter.W - 6) * pct / 100);
+    const edge = 3 + fillW;
+    meter.bar.setAttribute("width", fillW.toFixed(1));
+    meter.lead.setAttribute("cx", (edge - 8).toFixed(1));
+    meter.lead.style.display = fillW ? "" : "none";
+    meter.shine.setAttribute("width", Math.max(0, fillW - 24).toFixed(1));
+    for (const el of meter.slots) el.style.display = +el.dataset.x < edge - 13 ? "" : "none";
+  }
+
+  function setMeter(pct) {
+    if (!meter) buildMeter();
+    cancelAnimationFrame(meterAnim);
+    const animate = meter.painted && !reduceMotion.matches && Math.abs(pct - meterPct) >= 0.5;
+    meter.painted = true;
+    if (!animate) { meterPct = pct; applyMeter(pct); return; }
+    const from = meterPct, t0 = performance.now(), D = 950;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      meterPct = from + (pct - from) * e;
+      applyMeter(meterPct);
+      if (k < 1) meterAnim = requestAnimationFrame(step);
+    };
+    meterAnim = requestAnimationFrame(step);
+  }
+
+  // Slime oozing from the top edge of the cover panel when the book is on the shelf.
+  const EDGE_DRIPS = [[0.07, "d2", 7.2, -1], [0.15, "nub"], [0.27, "d1", 5.4, -3.2], [0.38, "nub"], [0.5, "d3", 8.6, -5],
+    [0.61, "nub"], [0.71, "d1", 6.1, -0.8], [0.8, "nub"], [0.9, "d2", 7.6, -4.4]];
+  function edgeSlime(W) {
+    const band = 5;
+    let shapes = `<rect x="-10" y="-10" width="${W + 20}" height="${10 + band}" rx="${band}"/>`;
+    EDGE_DRIPS.forEach(([f, kind, dur, delay], i) => {
+      shapes += dripMarkup(Math.round(f * W), band, kind, dur, delay, kind === "nub" ? 0.8 + (i % 2) * 0.3 : 1);
+    });
+    return `<svg width="${W}" height="64" viewBox="0 0 ${W} 64" aria-hidden="true" focusable="false"><g class="edge-goo" filter="url(#gb-goo)">${shapes}</g></svg>`;
+  }
+  function paintEdgeSlime(show) {
+    const host = $("vSlime");
+    host.hidden = !show;
+    if (!show) return;
+    const W = vCard.clientWidth;
+    if (host.dataset.w !== String(W)) { host.innerHTML = edgeSlime(W); host.dataset.w = W; }
+  }
+
+  let resizeTimer = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (meter && Math.abs($("tube").clientWidth - meter.W) > 2) buildMeter();
+      if (!viewer.hidden && !$("vSlime").hidden) paintEdgeSlime(true);
+    }, 120);
+  });
+
+  $("vIsbnCopy").addEventListener("click", () => {
+    const isbn = ISBN[vList[vIdx]];
+    if (!isbn) return;
+    try {
+      navigator.clipboard.writeText(isbn).then(() => toast(`Copied ISBN ${isbn}`), () => toast(`ISBN ${isbn}`));
+    } catch { toast(`ISBN ${isbn}`); }
+  });
+
   // ---------- Viewer ----------
   let vList = [], vIdx = 0, openedAt = 0, lastFocus = null;
 
@@ -1255,6 +1505,12 @@ main{min-width:0}
     $("vDate").textContent = b.date;
     $("vPages").textContent = b.pages;
     $("vArtist").textContent = b.artist;
+    $("vStory").textContent = STORIES[n] || "";
+    const isbn = ISBN[n];
+    $("vIsbn").textContent = isbn ? `${isbn[0]}-${isbn.slice(1, 4)}-${isbn.slice(4, 9)}-${isbn[9]}` : "–";
+    $("vIsbnCopy").hidden = !isbn;
+    vCard.classList.toggle("owned", own === true);
+    paintEdgeSlime(own === true);
     const sets = SETS.filter(s => s.books.includes(n));
     $("vSet").hidden = !sets.length || !state.owned;
     if (sets.length && state.owned) {
